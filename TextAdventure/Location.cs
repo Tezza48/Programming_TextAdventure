@@ -110,9 +110,9 @@ namespace TextAdventure
 			return roomDescription;
 		}
 
-		public void setDescription(string description)
-		{
-			roomDescription = description;
-		}
+        public void setDescription(string description)
+        {
+            roomDescription = description;
+        }
     }
 }
