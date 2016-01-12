@@ -22,11 +22,11 @@ namespace TextAdventure
 
 			// build the "map"
 			Location l1 = new Location("Entrance to hall", "You stand at the entrance of a long hallway. The hallways gets darker\nand darker, and you cannot see what lies beyond. To the east\nis an old oaken door, unlocked and beckoning.");
-			Item rock = new Item("Rock", "A small rock; there is nothing interesting about it.");
+			Item rock = new Item();
 			l1.addItem(rock);
 
 			Location l2 = new Location("End of hall", "You have reached the end of a long dark hallway. You can\nsee nowhere to go but back.");
-			Item window = new Item("Window");
+			Item window = new Item();
 			l2.addItem(window);
 
 			Location l3 = new Location("Small study", "This is a small and cluttered study, containing a desk covered with\npapers. Though they no doubt are of some importance,\nyou cannot read their writing");
@@ -70,35 +70,8 @@ namespace TextAdventure
         // TODO: Implement the input handling algorithm.
 		public void doAction(string command)
 		{
-            if (command == "show location")
-            {
-                showLocation();
-            }
-            else if (command == "show inventory" )
-            {
-                showInventory();
-            }
-            else if (command.StartsWith( "inspect" ) )
-            {
-                command.Remove( 0, 7 );
-                inspectItem( command );
-            }
-            else if (command == "north" || command == "south" || command == "east" || command == "west")
-            {
-
-            }
-            else invalidCommand();
-		}
-
-        private void changeLocation(string direction)
-        {
-            // implement
-        }
-
-        private void invalidCommand()
-        {
 			Console.WriteLine("\nInvalid command, are you confused?\n");
-        }
+		}
 
 		private void showInventory()
 		{
@@ -118,12 +91,6 @@ namespace TextAdventure
 
 			Console.WriteLine("");
 		}
-
-        private void inspectItem(string commandItem)
-        {
-            // search inventory for "commandItem"
-            // write the item's description to the console
-        }
 
 		public void Update()
 		{

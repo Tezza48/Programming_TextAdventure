@@ -8,32 +8,10 @@ namespace TextAdventure
 {    
 	class Item
 	{
-        private string name;
-        private string description;
-
-        public string Name { get { return name; } }
-        public string Description { get { return description; } }
-
-        public Item()
+	
+		public Item()
 		{
-            name = "A strange item";
-            description = "I do not know what this item is";
+
 		}
-        public Item ( string name )
-        {
-            this.name = name;
-            description = "There is nothing interesting about this item.";
-        }
-        public Item ( string name, string description )
-        {
-            this.name = name;
-            this.description = description;
-        }
-
-        public override string ToString()
-        {
-            return name;
-        }
-
 	}
 }
