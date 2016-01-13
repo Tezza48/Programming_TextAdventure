@@ -12,7 +12,7 @@ namespace TextAdventure
         private string roomTitle;
         private string roomDescription;
         private List<Exit> exits;
-		private List<Item> inventory;
+		private List<Item> inventory; // the room's inventory
 
         public Location()
         {
