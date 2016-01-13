@@ -28,13 +28,13 @@ namespace TextAdventure
 
 			// build the "map"
 			Location l1 = new Location("Entrance to hall", "You stand at the entrance of a long hallway. The hallways gets darker\nand darker, and you cannot see what lies beyond. To the east\nis an old oaken door, unlocked and beckoning.");
-			Item rock = new Item("Rock", "It's a rock!");
-            Item pen = new Item("Pen");
+			Item rock = new Item("Rock", "It's a rock!", true);
+            Item pen = new Item("Pen", true);
 			l1.addItem(rock);
             l1.addItem(pen);
 
 			Location l2 = new Location("End of hall", "You have reached the end of a long dark hallway. You can\nsee nowhere to go but back.");
-			Item window = new Item("Window", "A small window, you might fit through if you can break the glass...");
+			Item window = new Item("Window", "A small window, you might fit through if you can break the glass...", false);
             window.IsTakeable = false;
 			l2.addItem(window);
 
@@ -80,18 +80,17 @@ namespace TextAdventure
 		public void doAction(string command)
 		{
             /*
-                Look    x
-                    showLocation
-                Move    x
+                Look        x
+                Move        x
                 Inventory   x
-                Take    x
-                    Location.takeItem
-                Use
+                Take        x
+                Use         x
+
+                
             */
 
-            List<string> commandList = command.Split(' ').ToList();
-
             // split the string into a list of words
+            List<string> commandList = command.Split(' ').ToList();
 
             if (command == "look")
             {
@@ -101,9 +100,11 @@ namespace TextAdventure
             {
                 moveToLocation(commandList);
             }
-            else if (command == "inventory")
+            else if (commandList[0].Equals("inventory"))
             {
-                showInventory();
+                if (commandList.Count() == 0)
+                    showInventory();
+                else inspectInventory(commandList);
             }
             else if (commandList[0].Equals("take"))
             {
@@ -159,10 +160,17 @@ namespace TextAdventure
                         // look through the inventory for that item
                         if (item.ToString().Equals(commandList[itemCount]))
                         {
-                            inventory.Add(currentLocation.takeItem(commandList[itemCount]));
-                            isItem = true;
-                            Console.WriteLine("You took the " + item.ToString() + ".");
-                            break;
+                            if (item.IsTakeable)
+                            {
+                                inventory.Add(currentLocation.takeItem(commandList[itemCount]));
+                                isItem = true;
+                                Console.WriteLine("You took the " + item.ToString() + ".");
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("You cant take the " + item.ToString() + ".");
+                            }
                         }
                     }
                     if (!isItem)
