@@ -151,6 +151,8 @@ namespace TextAdventure
             {
                 if (currentLocation.getInventory().Count() > 0)
                 {
+                    // is this command an item in the location
+                    bool isItem = false;
                     // for each item specified after the command
                     foreach (Item item in currentLocation.getInventory())
                     {
@@ -158,19 +160,21 @@ namespace TextAdventure
                         if (item.ToString().Equals(commandList[itemCount]))
                         {
                             inventory.Add(currentLocation.takeItem(commandList[itemCount]));
-                            Console.WriteLine("\nYou took the " + item.ToString() + ".\n");
+                            isItem = true;
+                            Console.WriteLine("You took the " + item.ToString() + ".");
                             break;
                         }
-                        else
-                        {
-                            Console.WriteLine("\n\"" + commandList[1] + "\" is not an item in this room.");
-                        }
+                    }
+                    if (!isItem)
+                    {
+                        Console.WriteLine("\n\"" + commandList[itemCount] + "\" is not an item you can take.");
                     }
                 }
                 else
                 {
-                    Console.WriteLine("\nThere are no items here.\n");
+                    Console.WriteLine("\nThere are no items here.");
                 }
+                Console.WriteLine();
             }
         }
 
