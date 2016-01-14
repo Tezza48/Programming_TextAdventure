@@ -27,23 +27,19 @@ namespace TextAdventure
 			Console.WriteLine("Welcome adventurer, prepare yourself for a fantastical journey into the unknown.");
 
             // build the "map"
-            // note, when adding items, they should be added in alphabetical
-            //  order to produce a sorted Inventory.
 			Location l1 = new Location("Entrance to hall", "You stand at the entrance of a long hallway. The hallways gets darker\nand darker, and you cannot see what lies beyond. To the east\nis an old oaken door, unlocked and beckoning.");
-            Item pen = new Item("Pen","A pen with an intricate gold inlay", true);
-			Item rock = new Item("Rock", "It's a rock!", true);
+            Multitool pen = new Multitool("Pen","A pen with an intricate gold inlay", null);
+			Key rock = new Key("Rock", "It's a rock!", true);// smashes the window in l2
             l1.addItem(pen);
 			l1.addItem(rock);
 
 			Location l2 = new Location("End of hall", "You have reached the end of a long dark hallway. You can\nsee a window above a bookcase to your left.");
-			Item window = new Item("Window", "A small, fragile window", false);
-            Item openWindow = new Item("Smashed Window", "A small, now opened window", false);
-            window.IsTakeable = false;
-            window.AlternateItem = openWindow;
+            Item openWindow = new Item("Smashed Window", "A small, now opened window");
+			Lock window = new Lock("Window", "A small, fragile window", rock, openWindow, null);
 			l2.addItem(window);
 
 			Location l3 = new Location("Small study", "This is a small and cluttered study, containing a desk covered with\npapers. Though they no doubt are of some importance,\nyou cannot read their writing");
-
+            Item letter = new Item("Closed_Letter", "An old letter, closed with a wax seal");
 
             // Location l4 = new Location("Ledge", "A ledge high above the ground, leading round to the West wing.");
 
@@ -132,9 +128,12 @@ namespace TextAdventure
             }
             else if (commandList[0].Equals("use"))
             {
-                Console.WriteLine("\nInvalid command, are you confused?\n");
-                // check to use with an item
-                // check if that item can open a locked exit
+                if (commandList.Count() == 3)// must have two additional commands; item and item to use it on
+                {
+                    // check if the first command is an item in the player's inventory
+                        // then check if that the second command is an item in the player's inventory
+                        // if not check the current location for locks that match that command
+                }
             }
             else
             {
@@ -182,7 +181,7 @@ namespace TextAdventure
                 }
             }
         }
-
+        
         private void takeItem(List<string> commandList)
         {
             // try to take all commands after take
@@ -198,23 +197,24 @@ namespace TextAdventure
                         // look through the inventory for that item
                         if (item.ToString().Equals(commandList[itemCount]))
                         {
-                            if (item.IsTakeable)
+                            if (item.GetType() != typeof(Lock))
                             {
                                 // TODO add to a sorted position
                                 inventory.Add(currentLocation.takeItem(commandList[itemCount]));
-                                isItem = true;
                                 Console.WriteLine("You took the " + item.ToString() + ".");
+                                isItem = true;
                                 break;
                             }
                             else
                             {
+                                isItem = true;
                                 Console.WriteLine("You cant take the " + item.ToString() + ".");
                             }
                         }
                     }
                     if (!isItem)
                     {
-                        Console.WriteLine("\n\"" + commandList[itemCount] + "\" is not an item you can take.");
+                        Console.WriteLine("\"" + commandList[itemCount] + "\" is not an item you can take.");
                     }
                 }
                 else
@@ -224,7 +224,7 @@ namespace TextAdventure
                 Console.WriteLine();
             }
         }
-
+        
         private void showInventory()
 		{
 			if ( inventory.Count > 0 )
@@ -246,6 +246,7 @@ namespace TextAdventure
 
 		public void Update()
 		{
+
 			string currentCommand = Console.ReadLine().ToLower();
 
 			// instantly check for a quit
