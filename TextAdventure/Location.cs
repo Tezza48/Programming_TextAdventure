@@ -63,13 +63,33 @@ namespace TextAdventure
 			return new List<Exit>(exits);
 		}
 
-		public List<Item> getInventory()
+        public void addLockedExit (LockedExit exit)
+        {
+            lockedExits.Add(exit);
+        }
+
+        // adding removing getting locked exits
+        public void removeLockedExits(LockedExit exit)
+        {
+            if (lockedExits.Contains(exit))
+            {
+                lockedExits.Remove(exit);
+            }
+        }
+
+        public List<LockedExit> getLockedExits()
+        {
+            return new List<LockedExit>(lockedExits);
+        }
+
+        public List<Item> getInventory()
 		{
 			return new List<Item>(inventory);
 		}
 
 		public void addItem(Item itemToAdd)
 		{
+            // TODO add to a sorted position
 			inventory.Add(itemToAdd);
 		}
 

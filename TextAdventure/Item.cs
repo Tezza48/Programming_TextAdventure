@@ -12,17 +12,19 @@ namespace TextAdventure
         private string itemName;
         private string itemDescription;
         private bool isTakeable = false; // can this item be taken
-        private string itemUsedWithName;
+        private Item itemUsedWith; 
         private Item alternateItem;
-        private Exit exit = null;
+        private LockedExit pairedLockedExit = null; // locked exit this is paired to if this item can become an exit 
+
+        public string ItemDescription { get { return itemDescription; } }
 
         public bool IsTakeable { get { return isTakeable; } set { isTakeable = value; } }
 
-        internal string ItemUsedWithName { get { return itemUsedWithName; } set { itemUsedWithName = value; } }
+        internal Item ItemUsedWithName { get { return itemUsedWith; } set { itemUsedWith = value; } }
 
         internal Item AlternateItem { get { return alternateItem; } set { alternateItem = value; } }
 
-        internal Exit Exit { set { exit = value; } }
+        internal LockedExit PairedLockedExit { get { return pairedLockedExit; } set { pairedLockedExit = value; } }
 
         public Item()
 		{

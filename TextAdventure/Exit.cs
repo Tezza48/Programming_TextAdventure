@@ -15,8 +15,8 @@ namespace TextAdventure
 
 		public static string[] shortDirections = {"Null", "N", "S", "E", "W", "U", "D", "NE", "NW", "SE", "SW", "I", "O"};
 
-		private Location leadsTo;
-		private Directions direction;
+		protected Location leadsTo;
+		protected Directions direction;
 
 		public Exit()
 		{

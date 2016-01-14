@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 /*
     TODO:
-    Sort the inventory
+    use a more sophisticated sorting algorithm for searching the inventory and adding items
     Sort the items in the Take Command
 */
 
@@ -26,15 +26,16 @@ namespace TextAdventure
 
 			Console.WriteLine("Welcome adventurer, prepare yourself for a fantastical journey into the unknown.");
 
-			// build the "map"
+            // build the "map"
+            // note, when adding items, they should be added in alphabetical
+            //  order to produce a sorted Inventory.
 			Location l1 = new Location("Entrance to hall", "You stand at the entrance of a long hallway. The hallways gets darker\nand darker, and you cannot see what lies beyond. To the east\nis an old oaken door, unlocked and beckoning.");
+            Item pen = new Item("Pen","A pen with an intricate gold inlay", true);
 			Item rock = new Item("Rock", "It's a rock!", true);
-            rock.ItemUsedWithName = "window";
-            Item pen = new Item("Pen", true);
-			l1.addItem(rock);
             l1.addItem(pen);
+			l1.addItem(rock);
 
-			Location l2 = new Location("End of hall", "You have reached the end of a long dark hallway. You can\nsee nowhere to go but back.");
+			Location l2 = new Location("End of hall", "You have reached the end of a long dark hallway. You can\nsee a window above a bookcase to your left.");
 			Item window = new Item("Window", "A small, fragile window", false);
             Item openWindow = new Item("Smashed Window", "A small, now opened window", false);
             window.IsTakeable = false;
@@ -43,10 +44,14 @@ namespace TextAdventure
 
 			Location l3 = new Location("Small study", "This is a small and cluttered study, containing a desk covered with\npapers. Though they no doubt are of some importance,\nyou cannot read their writing");
 
+
+            // Location l4 = new Location("Ledge", "A ledge high above the ground, leading round to the West wing.");
+
 			l1.addExit(new Exit(Exit.Directions.North, l2));
 			l1.addExit(new Exit(Exit.Directions.East, l3));
 
 			l2.addExit(new Exit(Exit.Directions.South, l1));
+            // l2.addLockedExit(new LockedExit(Exit.Directions.Up, l4, "rock"));
 
 			l3.addExit(new Exit(Exit.Directions.West, l1));
 
@@ -105,9 +110,14 @@ namespace TextAdventure
             }
             else if (commandList[0].Equals("inventory"))
             {
-                if (commandList.Count() == 0)
+                if (commandList.Count() == 1)
                     showInventory();
-                else inspectInventory(commandList);
+                else if (commandList.Count() == 2)
+                {
+                    bool itemExists = inspectInventory(commandList[1], inventory);
+                    if (!itemExists)
+                        Console.WriteLine("/nThere is no " + commandList[1] + "in your inventory.\n");
+                }
             }
             else if (commandList[0].Equals("take"))
             {
@@ -116,6 +126,8 @@ namespace TextAdventure
             else if (commandList[0].Equals("use"))
             {
                 Console.WriteLine("\nInvalid command, are you confused?\n");
+                // check to use with an item
+                // check if that item can open a locked exit
             }
             else
             {
@@ -123,9 +135,20 @@ namespace TextAdventure
             }
 		}
 
-        private void inspectInventory(List<string> commandList)
+        private bool inspectInventory(string itemName, List<Item> searchInventory)
         {
-
+            // inspect an inventory and write the description of the item if found, else return false
+            // check if that item is in your inventory.
+            foreach (Item currentItem in searchInventory)
+            {
+                if (currentItem.ToString().Equals(itemName))
+                {
+                    // write the item's description to the output stream
+                    Console.WriteLine(currentItem.ItemDescription + "\n");
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void moveToLocation(List<string> commandList)
@@ -170,6 +193,7 @@ namespace TextAdventure
                         {
                             if (item.IsTakeable)
                             {
+                                // TODO add to a sorted position
                                 inventory.Add(currentLocation.takeItem(commandList[itemCount]));
                                 isItem = true;
                                 Console.WriteLine("You took the " + item.ToString() + ".");
