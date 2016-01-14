@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace TextAdventure
 {    
+
 	class Item
 	{
+
+        public enum ItemType
+        {
+            Item, Key, Component
+        };
 
         private string itemName;
         private string itemDescription;
