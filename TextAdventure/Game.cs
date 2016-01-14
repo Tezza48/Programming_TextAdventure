@@ -100,9 +100,16 @@ namespace TextAdventure
             // split the string into a list of words
             List<string> commandList = command.Split(' ').ToList();
 
-            if (command == "look")
+            if (commandList[0].Equals("look"))
             {
-                showLocation();
+                if (commandList.Count() == 1)
+                    showLocation();
+                else if (commandList.Count() == 2)
+                {
+                    bool itemExists = inspectInventory(commandList[1], currentLocation.getInventory());
+                    if (!itemExists)
+                        Console.WriteLine("/nThere is no " + commandList[1] + "in this location.\n");
+                }
             }
             else if (commandList[0].Equals("move") || commandList[0].Equals("walk"))
             {
