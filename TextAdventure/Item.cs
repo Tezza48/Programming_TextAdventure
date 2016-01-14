@@ -12,11 +12,17 @@ namespace TextAdventure
         private string itemName;
         private string itemDescription;
         private bool isTakeable = false; // can this item be taken
+        private string itemUsedWithName;
+        private Item alternateItem;
+        private Exit exit = null;
 
-        public bool IsTakeable {
-            get { return isTakeable; }
-            set { isTakeable = value; }
-        }
+        public bool IsTakeable { get { return isTakeable; } set { isTakeable = value; } }
+
+        internal string ItemUsedWithName { get { return itemUsedWithName; } set { itemUsedWithName = value; } }
+
+        internal Item AlternateItem { get { return alternateItem; } set { alternateItem = value; } }
+
+        internal Exit Exit { set { exit = value; } }
 
         public Item()
 		{
@@ -53,6 +59,11 @@ namespace TextAdventure
         public override string ToString()
         {
             return itemName.ToLower();
+        }
+
+        public void addUse()
+        {
+
         }
     }
 }

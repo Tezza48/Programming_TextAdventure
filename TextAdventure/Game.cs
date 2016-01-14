@@ -29,13 +29,16 @@ namespace TextAdventure
 			// build the "map"
 			Location l1 = new Location("Entrance to hall", "You stand at the entrance of a long hallway. The hallways gets darker\nand darker, and you cannot see what lies beyond. To the east\nis an old oaken door, unlocked and beckoning.");
 			Item rock = new Item("Rock", "It's a rock!", true);
+            rock.ItemUsedWithName = "window";
             Item pen = new Item("Pen", true);
 			l1.addItem(rock);
             l1.addItem(pen);
 
 			Location l2 = new Location("End of hall", "You have reached the end of a long dark hallway. You can\nsee nowhere to go but back.");
-			Item window = new Item("Window", "A small window, you might fit through if you can break the glass...", false);
+			Item window = new Item("Window", "A small, fragile window", false);
+            Item openWindow = new Item("Smashed Window", "A small, now opened window", false);
             window.IsTakeable = false;
+            window.AlternateItem = openWindow;
 			l2.addItem(window);
 
 			Location l3 = new Location("Small study", "This is a small and cluttered study, containing a desk covered with\npapers. Though they no doubt are of some importance,\nyou cannot read their writing");
@@ -119,6 +122,11 @@ namespace TextAdventure
                 Console.WriteLine("\nInvalid command, are you confused?\n");
             }
 		}
+
+        private void inspectInventory(List<string> commandList)
+        {
+
+        }
 
         private void moveToLocation(List<string> commandList)
         {

@@ -47,6 +47,7 @@
     <Compile Include="Game.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Location.cs" />
+    <Compile Include="LockedExit.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
