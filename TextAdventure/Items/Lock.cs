@@ -18,7 +18,7 @@ namespace TextAdventure
 
         private Key key;
         private Item unlockedVersion;
-        private LockedExit lockedExit;
+        private Exit lockedExit; // exit that this lock blocks off
 
         public Lock()
         {
@@ -36,6 +36,15 @@ namespace TextAdventure
             key = _key;
             unlockedVersion = _unlockedVersion;
             lockedExit = _lockedExit;
+        }
+
+        public Tuple<bool, Exit, Item> Unlock(Key _key)
+        {
+            // return whether the key is correct and the new room
+            if (_key == key)
+                return Tuple.Create(true, lockedExit, unlockedVersion);
+            else
+                return Tuple.Create(false, new Exit(), new Item());// create a blank room + item if incorrect
         }
     }
 }
