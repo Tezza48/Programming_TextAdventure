@@ -12,7 +12,6 @@ namespace TextAdventure
         private string roomTitle;
         private string roomDescription;
         private List<Exit> exits;
-        private List<LockedExit> lockedExits;
 		private List<Item> inventory; // the room's inventory
 
         public Location()
@@ -62,25 +61,6 @@ namespace TextAdventure
 		{
 			return new List<Exit>(exits);
 		}
-
-        public void addLockedExit (LockedExit exit)
-        {
-            lockedExits.Add(exit);
-        }
-
-        // adding removing getting locked exits
-        public void removeLockedExits(LockedExit exit)
-        {
-            if (lockedExits.Contains(exit))
-            {
-                lockedExits.Remove(exit);
-            }
-        }
-
-        public List<LockedExit> getLockedExits()
-        {
-            return new List<LockedExit>(lockedExits);
-        }
 
         public List<Item> getInventory()
 		{
@@ -135,5 +115,6 @@ namespace TextAdventure
 		{
 			roomDescription = description;
 		}
+        
     }
 }

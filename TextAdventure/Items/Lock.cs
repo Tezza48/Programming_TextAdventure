@@ -17,34 +17,64 @@ namespace TextAdventure
         */
 
         private Key key;
+        private Exit.Directions exitDirection;// desired exit direction
         private Item unlockedVersion;
-        private Exit lockedExit; // exit that this lock blocks off
+        private Location lockedLocation; // location that this lock blocks off
+        private string unlockMessage;
+
+        internal Location LockedLocation { set { lockedLocation = value; } }
 
         public Lock()
         {
             itemName = "";
             itemDescription = "";
             key = null;
+            exitDirection = Exit.Directions.Undefined;
             unlockedVersion = null;
-            lockedExit = null;
+            lockedLocation = null;
+            unlockMessage = "";
         }
 
-        public Lock(string name, string description, Key _key, Item _unlockedVersion, LockedExit _lockedExit)
+        public Lock(string name, string description, string message)
         {
             itemName = name;
             itemDescription = description;
-            key = _key;
-            unlockedVersion = _unlockedVersion;
-            lockedExit = _lockedExit;
+            unlockMessage = message;
+            key = null;
+            exitDirection = Exit.Directions.Undefined;
+            unlockedVersion = null;
+            lockedLocation = null;
         }
 
-        public Tuple<bool, Exit, Item> Unlock(Key _key)
+        public Lock(string name, string description, string message, Key _key, Exit.Directions _exitDirection, Item _unlockedVersion)
+        {
+            itemName = name;
+            itemDescription = description;
+            unlockMessage = message;
+            key = _key;
+            exitDirection = _exitDirection;
+            unlockedVersion = _unlockedVersion;
+            lockedLocation = null;
+        }
+
+        public Lock(string name, string description, string message, Key _key, Exit.Directions _exitDirection, Item _unlockedVersion, Location _lockedLocation)
+        {
+            itemName = name;
+            itemDescription = description;
+            unlockMessage = message;
+            key = _key;
+            exitDirection = _exitDirection;
+            unlockedVersion = _unlockedVersion;
+            lockedLocation = _lockedLocation;
+        }
+
+        public Tuple<bool, Exit.Directions, Location, string, Item> Unlock(Key _key)
         {
             // return whether the key is correct and the new room
             if (_key == key)
-                return Tuple.Create(true, lockedExit, unlockedVersion);
+                return Tuple.Create(true, exitDirection, lockedLocation, unlockMessage, unlockedVersion);
             else
-                return Tuple.Create(false, new Exit(), new Item());// create a blank room + item if incorrect
+                return Tuple.Create(false, Exit.Directions.Undefined, new Location(), "", new Item());// create a blank room + item if incorrect
         }
     }
 }

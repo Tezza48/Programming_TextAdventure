@@ -35,19 +35,19 @@ namespace TextAdventure
 
 			Location l2 = new Location("End of hall", "You have reached the end of a long dark hallway. You can\nsee a window above a bookcase to your left.");
             Item openWindow = new Item("Smashed Window", "A small, now opened window");
-			Lock window = new Lock("Window", "A small, fragile window", rock, openWindow, null);
-			l2.addItem(window);
+			Lock window = new Lock("Window", "A small, fragile window", "you smashed the glass and opened the window", rock, Exit.Directions.Up, openWindow);
 
 			Location l3 = new Location("Small study", "This is a small and cluttered study, containing a desk covered with\npapers. Though they no doubt are of some importance,\nyou cannot read their writing");
             Item letter = new Item("Closed_Letter", "An old letter, closed with a wax seal");
 
-            // Location l4 = new Location("Ledge", "A ledge high above the ground, leading round to the West wing.");
+            Location l4 = new Location("Ledge", "A ledge high above the ground, leading round to the West wing.");
+            window.LockedLocation = l4;
+			l2.addItem(window);
 
 			l1.addExit(new Exit(Exit.Directions.North, l2));
 			l1.addExit(new Exit(Exit.Directions.East, l3));
 
 			l2.addExit(new Exit(Exit.Directions.South, l1));
-            // l2.addLockedExit(new LockedExit(Exit.Directions.Up, l4, "rock"));
 
 			l3.addExit(new Exit(Exit.Directions.West, l1));
 
@@ -104,7 +104,7 @@ namespace TextAdventure
                 {
                     bool itemExists = inspectInventory(commandList[1], currentLocation.getInventory());
                     if (!itemExists)
-                        Console.WriteLine("/nThere is no " + commandList[1] + "in this location.\n");
+                        Console.WriteLine("\nThere is no " + commandList[1] + "in this location.\n");
                 }
             }
             else if (commandList[0].Equals("move") || commandList[0].Equals("walk"))
@@ -119,7 +119,7 @@ namespace TextAdventure
                 {
                     bool itemExists = inspectInventory(commandList[1], inventory);
                     if (!itemExists)
-                        Console.WriteLine("/nThere is no " + commandList[1] + "in your inventory.\n");
+                        Console.WriteLine("\nThere is no " + commandList[1] + "in your inventory.\n");
                 }
             }
             else if (commandList[0].Equals("take"))
@@ -128,18 +128,67 @@ namespace TextAdventure
             }
             else if (commandList[0].Equals("use"))
             {
-                if (commandList.Count() == 3)// must have two additional commands; item and item to use it on
+                bool canUse;
+                if (commandList.Count() == 3)
                 {
-                    // check if the first command is an item in the player's inventory
-                        // then check if that the second command is an item in the player's inventory
-                        // if not check the current location for locks that match that command
+                    canUse = useKey(commandList);
+                    if(!canUse) Console.WriteLine("\nYou cant use \"" + commandList[1] + "\" on \"" + commandList[2] + "\"");
                 }
+                else
+                {
+                    Console.WriteLine("\nInvalid \"take\"command, are you confused?\n");
+                }
+
             }
             else
             {
                 Console.WriteLine("\nInvalid command, are you confused?\n");
             }
 		}
+
+        private bool useKey(List<string> commandList)
+        {
+            // find the lock in the currentLocation corresponding with the third command
+            foreach (Item currentLockItem in currentLocation.getInventory())
+            {
+                Lock currentLock = currentLockItem as Lock;
+                if (currentLock != null)
+                {
+                    if (currentLock.ToString() == commandList[2])// this lock is the one specified
+                    {
+                        // if it's key is in the player's inventory
+                        foreach (Item currentKeyItem in inventory)
+                        {
+                            Key currentKey = currentKeyItem as Key;
+                            if (currentKey != null)
+                            {
+                                if (currentKey.ToString() == commandList[1])
+                                {
+                                    Tuple<bool, Exit.Directions, Location, string, Item> unlock = currentLock.Unlock(currentKey);
+                                    if (unlock.Item1)
+                                    {
+                                        // remove the lock from the currentLocation's inventory
+                                        currentLocation.getInventory().Remove(currentLock);
+                                        // add the lock's alternative item to the currentLocation's inventory
+                                        currentLocation.addItem(unlock.Item5);
+                                        // add an exit to the current location leading to the Lock's location
+                                        currentLocation.addExit(new Exit(unlock.Item2, unlock.Item3));
+                                        // display the lock's unlocking message
+                                        Console.WriteLine(unlock.Item5);
+                                        // return once unlocked
+                                    }
+                                    else
+                                    {
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
 
         private bool inspectInventory(string itemName, List<Item> searchInventory)
         {
