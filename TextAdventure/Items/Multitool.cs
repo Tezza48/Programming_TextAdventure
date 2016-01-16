@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TextAdventure
 {
-    class Multitool : Tool
+    /*class Multitool : Tool
     {
         // can be used on multiple craftables
         private List<Craftable> itemsUsedOn;
@@ -31,5 +31,5 @@ namespace TextAdventure
             itemDescription = description;
             itemsUsedOn = _itemsUsedOn;
         }
-    }
+    }*/
 }

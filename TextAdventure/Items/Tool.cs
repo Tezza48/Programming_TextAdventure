@@ -6,13 +6,8 @@ using System.Threading.Tasks;
 
 namespace TextAdventure
 {
-    class Tool : Item
+    /*class Tool : Item
     {
-        /*
-            A tool must:
-                have an item it's used on
-        */
-
         private Craftable itemUsedOn;
 
         public Tool()
@@ -28,5 +23,5 @@ namespace TextAdventure
             itemDescription = description;
             itemUsedOn = _itemUsedOn;
         }
-    }
+    }*/
 }
