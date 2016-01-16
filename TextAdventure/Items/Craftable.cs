@@ -8,10 +8,7 @@ namespace TextAdventure
 {
     class Craftable : Item
     {
-        /*
-            A craftable must:
-                turn into another item when it's tool is used on it
-        */
+        // a craftable is an item that when used with the other items in it's recipie, creates another item
         private Item craftedItem;
 
         public Craftable()
