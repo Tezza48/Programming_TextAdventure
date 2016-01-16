@@ -28,10 +28,8 @@ namespace TextAdventure
 
             // build the "map"
 			Location l1 = new Location("Entrance to hall", "You stand at the entrance of a long hallway. The hallways gets darker\nand darker, and you cannot see what lies beyond. To the east\nis an old oaken door, unlocked and beckoning.");
-            Multitool pen = new Multitool("Pen","A pen with an intricate gold inlay", null);
-			Key rock = new Key("Rock", "It's a rock!", true);// smashes the window in l2
-            l1.addItem(pen);
-			l1.addItem(rock);
+            Key rock = new Key("Rock", "It's a rock!", true);// smashes the window in l2
+            l1.addItem(rock);
 
 			Location l2 = new Location("End of hall", "You have reached the end of a long dark hallway. You can\nsee a window above a bookcase to your left.");
             Item openWindow = new Item("Smashed Window", "A small, now opened window");
@@ -89,7 +87,7 @@ namespace TextAdventure
                 Inventory   x
                 Take        x
                 Use         x
-
+                craft
                 
             */
 
@@ -139,6 +137,10 @@ namespace TextAdventure
                     Console.WriteLine("\nInvalid \"take\"command, are you confused?\n");
                 }
 
+            }
+            else if (commandList[0].Equals("craft"))
+            {
+                Console.WriteLine("\nCrafting's not implimented yet!\n");
             }
             else
             {
