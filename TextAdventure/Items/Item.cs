@@ -13,6 +13,8 @@ namespace TextAdventure
         protected string itemName;
         protected string itemDescription;
 
+        public string ItemName { get { return itemName; } }
+
         public string ItemDescription { get { return itemDescription; } }
 
         public Item()

@@ -29,7 +29,16 @@ namespace TextAdventure
             // build the "map"
 			Location l1 = new Location("Entrance to hall", "You stand at the entrance of a long hallway. The hallways gets darker\nand darker, and you cannot see what lies beyond. To the east\nis an old oaken door, unlocked and beckoning.");
             Key rock = new Key("Rock", "It's a rock!", true);// smashes the window in l2
+            Craftable mummy = new Craftable("Mummy", "");
+            Item daddy = new Item("Daddy");
+            Item baby = new Item("Baby");
+            List<Item> daddyList = new List<Item>();
+            daddyList.Add(daddy);
+            Recipe business = new Recipe(daddyList, baby);
+            mummy.Recipie = business;
             l1.addItem(rock);
+            l1.addItem(mummy);
+            l1.addItem(daddy);
 
 			Location l2 = new Location("End of hall", "You have reached the end of a long dark hallway. You can\nsee a window above a bookcase to your left.");
             Item openWindow = new Item("Smashed Window", "A small, now opened window");
@@ -64,7 +73,7 @@ namespace TextAdventure
 
 				for ( int i = 0; i < currentLocation.getInventory().Count; i++ )
 				{
-					Console.WriteLine(currentLocation.getInventory()[i].ToString());
+					Console.WriteLine(currentLocation.getInventory()[i].ItemName);
 				}
 			}
 	
@@ -87,7 +96,7 @@ namespace TextAdventure
                 Inventory   x
                 Take        x
                 Use         x
-                craft
+                craft       x
                 
             */
 
@@ -126,11 +135,10 @@ namespace TextAdventure
             }
             else if (commandList[0].Equals("use"))
             {
-                bool canUse;
                 if (commandList.Count() == 3)
                 {
-                    canUse = useKey(commandList);
-                    if(!canUse) Console.WriteLine("\nYou cant use \"" + commandList[1] + "\" on \"" + commandList[2] + "\"");
+                    bool canUse = useKey(commandList);
+                    if(!canUse) Console.WriteLine("\nYou cant use \"" + commandList[1] + "\" with \"" + commandList[2] + "\"");
                 }
                 else
                 {
@@ -140,13 +148,78 @@ namespace TextAdventure
             }
             else if (commandList[0].Equals("craft"))
             {
-                Console.WriteLine("\nCrafting's not implimented yet!\n");
+                craftItem(commandList);
             }
             else
             {
                 Console.WriteLine("\nInvalid command, are you confused?\n");
             }
 		}
+
+        private void craftItem(List<string> commandList)
+        {
+            // search the player's inventory for the items and make a temporary list of these items
+            List<Item> givenItems = new List<Item>();
+            bool validItems = true;
+            foreach (string givenItem in commandList.GetRange(1, commandList.Count() - 1))
+            {
+                bool found = false;
+                foreach (Item currentItem in inventory)
+                {
+                    if (currentItem.ToString() == givenItem)
+                    {
+                        found = true;
+                        givenItems.Add(currentItem);
+                        continue;
+                    }
+                }
+                if (!found)
+                {
+                    Console.WriteLine("\nYou don't have a \"" + givenItem + "\" in your bag");
+                    validItems = false;
+                    break;
+                }
+            }
+            if (validItems)
+            {
+                // remove the craftable from the list and give it a separate variable
+                Craftable craftable = null;
+                foreach (Item item in givenItems)
+                {
+                    craftable = item as Craftable;
+                    if (craftable != null)
+                    {
+                        givenItems.Remove(craftable);
+                        break;
+                    }
+                }
+                // if none of the items is a craftable display an error message and stop
+                if (craftable != null)
+                {
+                    // use the craft method of the craftable and pass it the other items left in the list
+                    Item product = craftable.Craft(givenItems);
+                    // if it returns null the give an error message and stop the operation
+                    if (product != null)
+                    {
+                        // remove the items in the temporary list and the craftable from the inventory
+                        foreach (Item item in givenItems)
+                            inventory.Remove(item);
+                        inventory.Remove(craftable);
+                        // add the returned item to the player's inventory
+                        inventory.Add(product);
+                        Console.WriteLine("\nYou created: " + product.ToString() + "!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nThese Items don't work together.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("\nThese Items don't work together.");
+                }
+            }
+        }
 
         private bool useKey(List<string> commandList)
         {
@@ -177,7 +250,9 @@ namespace TextAdventure
                                         currentLocation.addExit(new Exit(unlock.Item2, unlock.Item3));
                                         // display the lock's unlocking message
                                         Console.WriteLine(unlock.Item5);
+                                        Console.WriteLine();
                                         // return once unlocked
+                                        return true;
                                     }
                                     else
                                     {
@@ -284,7 +359,7 @@ namespace TextAdventure
 
 				foreach ( Item item in inventory )
 				{
-					Console.WriteLine(item.ToString());
+					Console.WriteLine(item.ItemName);
 				}
 			}
 			else

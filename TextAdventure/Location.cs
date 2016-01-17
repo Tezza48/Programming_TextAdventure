@@ -83,13 +83,12 @@ namespace TextAdventure
 
 		public Item takeItem(string name)
 		{
-			foreach ( Item _item in inventory )
+			foreach ( Item item in inventory )
 			{
-                if (_item.ToString() == name)
+                if (item.ToString() == name)
 				{
-					Item temp = _item;
-					inventory.Remove(temp);
-					return temp;
+					inventory.Remove(item);
+					return item;
 				}
 			}
 

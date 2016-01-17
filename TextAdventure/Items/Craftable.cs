@@ -11,6 +11,8 @@ namespace TextAdventure
         // a craftable is the main ingredient of a crafting recipie
         private Recipe recipie;
 
+        internal Recipe Recipie { set { recipie = value; } }
+
         public Craftable()
         {
             itemName = "";
