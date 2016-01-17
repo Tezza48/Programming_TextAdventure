@@ -243,7 +243,7 @@ namespace TextAdventure
                                     if (unlock.Item1)
                                     {
                                         // remove the lock from the currentLocation's inventory
-                                        currentLocation.getInventory().Remove(currentLock);
+                                        currentLocation.removeItem(currentLock);
                                         // add the lock's alternative item to the currentLocation's inventory
                                         currentLocation.addItem(unlock.Item5);
                                         // add an exit to the current location leading to the Lock's location
