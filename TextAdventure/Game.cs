@@ -27,6 +27,8 @@ namespace TextAdventure
 			Console.WriteLine("Welcome adventurer, prepare yourself for a fantastical journey into the unknown.");
 
             // build the "map"
+            // add locations and items
+            
 			Location l1 = new Location("Entrance to hall", "You stand at the entrance of a long hallway. The hallways gets darker\nand darker, and you cannot see what lies beyond. To the east\nis an old oaken door, unlocked and beckoning.");
             Key rock = new Key("Rock", "It's a rock!", true);// smashes the window in l2
             Craftable mummy = new Craftable("Mummy", "");
@@ -51,14 +53,19 @@ namespace TextAdventure
             window.LockedLocation = l4;
 			l2.addItem(window);
 
+            // add exits
 			l1.addExit(new Exit(Exit.Directions.North, l2));
 			l1.addExit(new Exit(Exit.Directions.East, l3));
 
 			l2.addExit(new Exit(Exit.Directions.South, l1));
 
 			l3.addExit(new Exit(Exit.Directions.West, l1));
+            
 
-			currentLocation = l1;
+             currentLocation = l1;
+
+            // Location C1L1 = new Location("");
+
 			showLocation();
 		}
 
