@@ -43,7 +43,7 @@ namespace TextAdventure
             l1.addItem(daddy);
 
 			Location l2 = new Location("End of hall", "You have reached the end of a long dark hallway. You can\nsee a window above a bookcase to your left.");
-            Item openWindow = new Item("Smashed Window", "A small, now opened window");
+            Item openWindow = new Item("Smashed_Window", "A small, now opened window");
 			Lock window = new Lock("Window", "A small, fragile window", "you smashed the glass and opened the window", rock, Exit.Directions.Up, openWindow);
 
 			Location l3 = new Location("Small study", "This is a small and cluttered study, containing a desk covered with\npapers. Though they no doubt are of some importance,\nyou cannot read their writing");

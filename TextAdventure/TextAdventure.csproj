@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InputHandler.cs" />
     <Compile Include="Items\Craftable.cs" />
     <Compile Include="Exit.cs" />
     <Compile Include="Game.cs" />
