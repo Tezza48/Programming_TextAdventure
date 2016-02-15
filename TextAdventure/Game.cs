@@ -12,6 +12,15 @@ using System.Threading.Tasks;
 
 namespace TextAdventure
 {
+    enum CommandType
+    {
+        Use,
+        Take,
+        Look,
+        Move,
+        Inventory,
+        Help
+    }
 	class Game
 	{
 		Location currentLocation;
@@ -69,164 +78,125 @@ namespace TextAdventure
 			showLocation();
 		}
 
-		public void showLocation()
-		{
-			Console.WriteLine("\n" + currentLocation.getTitle() + "\n");
-			Console.WriteLine(currentLocation.getDescription());
-
-			if (currentLocation.getInventory().Count > 0)
-			{
-				Console.WriteLine("\nThe room contains the following:\n");
-
-				for ( int i = 0; i < currentLocation.getInventory().Count; i++ )
-				{
-					Console.WriteLine(currentLocation.getInventory()[i].ItemName);
-				}
-			}
-	
-			Console.WriteLine("\nAvailable Exits: \n");
-
-			foreach (Exit exit in currentLocation.getExits() )
-			{
-				Console.WriteLine(exit.getDirection());
-			}
-
-			Console.WriteLine();
-		}
 
         // TODO: Implement the input handling algorithm.
 		public void doAction(string command)
 		{
+            #region Plan
+            // what do i want the user to input
             /*
-                Look        x
-                Move        x
-                Inventory   x
-                Take        x
-                Use         x
-                craft       x
-                
+                single commands
+                    look at the current area
+                    A single direction
+                    looking in inventory
+                complex commands
+                    above commands including verbs and filler words
+                    sentences for take commands
+                    sentences for using items together
             */
+            // What words will i need to look for?
+            /*
+                verbs: use, take, look, move, walk, help, inspect
+                single words: any exit name, inventory, look
+                "connector words" for splitting item names when crafting/using items together: with, and
+                removable words: at, my, in, the, from
+            */
+            // what do i want the algorithm to "output"
+            /*
+                Enum for a command type
+                    command type will dictate which method to use
+                Array of strings
+                    the various items/exits that may need to be used as paramiters for methods
+                Look at the room
+                Look at an item (in room or inventory)
+                Change Location
+                Look at inventory
+                Take an item
+                use an item on another item (key on lock)
+            */
+            // actual plan
+            /*
+                First:
+                    Count the number of words
+                        if 1,
+                            check if it's
+                                an exit
+                                inventory
+                                help
+                                look
+                        if more,
+                            Look for a verb
 
-            // split the string into a list of words
-            List<string> commandList = command.Split(' ').ToList();
-
-            if (commandList[0].Equals("look"))
-            {
-                if (commandList.Count() == 1)
-                    showLocation();
-                else if (commandList.Count() == 2)
-                {
-                    bool itemExists = inspectInventory(commandList[1], currentLocation.getInventory());
-                    if (!itemExists)
-                        Console.WriteLine("\nThere is no " + commandList[1] + "in this location.\n");
-                }
-            }
-            else if (commandList[0].Equals("move") || commandList[0].Equals("walk"))
-            {
-                moveToLocation(commandList);
-            }
-            else if (commandList[0].Equals("inventory"))
-            {
-                if (commandList.Count() == 1)
-                    showInventory();
-                else if (commandList.Count() == 2)
-                {
-                    bool itemExists = inspectInventory(commandList[1], inventory);
-                    if (!itemExists)
-                        Console.WriteLine("\nThere is no " + commandList[1] + "in your inventory.\n");
-                }
-            }
-            else if (commandList[0].Equals("take"))
-            {
-                takeItem(commandList);
-            }
-            else if (commandList[0].Equals("use"))
-            {
-                if (commandList.Count() == 3)
-                {
-                    bool canUse = useKey(commandList);
-                    if(!canUse) Console.WriteLine("\nYou cant use \"" + commandList[1] + "\" with \"" + commandList[2] + "\"");
-                }
-                else
-                {
-                    Console.WriteLine("\nInvalid \"take\"command, are you confused?\n");
-                }
-
-            }
-            else if (commandList[0].Equals("craft"))
-            {
-                craftItem(commandList);
-            }
-            else
-            {
-                Console.WriteLine("\nInvalid command, are you confused?\n");
-            }
-		}
-
-        private void craftItem(List<string> commandList)
-        {
-            // search the player's inventory for the items and make a temporary list of these items
-            List<Item> givenItems = new List<Item>();
-            bool validItems = true;
-            foreach (string givenItem in commandList.GetRange(1, commandList.Count() - 1))
-            {
-                bool found = false;
-                foreach (Item currentItem in inventory)
-                {
-                    if (currentItem.ToString() == givenItem)
-                    {
-                        found = true;
-                        givenItems.Add(currentItem);
-                        continue;
-                    }
-                }
-                if (!found)
-                {
-                    Console.WriteLine("\nYou don't have a \"" + givenItem + "\" in your bag");
-                    validItems = false;
-                    break;
-                }
-            }
-            if (validItems)
-            {
-                // remove the craftable from the list and give it a separate variable
-                Craftable craftable = null;
-                foreach (Item item in givenItems)
-                {
-                    craftable = item as Craftable;
-                    if (craftable != null)
-                    {
-                        givenItems.Remove(craftable);
-                        break;
-                    }
-                }
-                // if none of the items is a craftable display an error message and stop
-                if (craftable != null)
-                {
-                    // use the craft method of the craftable and pass it the other items left in the list
-                    Item product = craftable.Craft(givenItems);
-                    // if it returns null the give an error message and stop the operation
-                    if (product != null)
-                    {
-                        // remove the items in the temporary list and the craftable from the inventory
-                        foreach (Item item in givenItems)
-                            inventory.Remove(item);
-                        inventory.Remove(craftable);
-                        // add the returned item to the player's inventory
-                        inventory.Add(product);
-                        Console.WriteLine("\nYou created: " + product.ToString() + "!");
-                    }
-                    else
-                    {
-                        Console.WriteLine("\nThese Items don't work together.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("\nThese Items don't work together.");
-                }
-            }
+            */
+            #endregion
+            Dictionary<string, CommandType> Commands = new Dictionary<string, CommandType> { { "use", CommandType.Use}, {} };
         }
+
+        #region CommandMethods
+        /* private void craftItem(List<string> commandList)
+         {
+             // search the player's inventory for the items and make a temporary list of these items
+             List<Item> givenItems = new List<Item>();
+             bool validItems = true;
+             foreach (string givenItem in commandList)
+             {
+                 bool found = false;
+                 foreach (Item currentItem in inventory)
+                 {
+                     if (currentItem.ToString() == givenItem)
+                     {
+                         found = true;
+                         givenItems.Add(currentItem);
+                         continue;
+                     }
+                 }
+                 if (!found)
+                 {
+                     Console.WriteLine("\nYou don't have a \"" + givenItem + "\" in your bag");
+                     validItems = false;
+                     break;
+                 }
+             }
+             if (validItems)
+             {
+                 // remove the craftable from the list and give it a separate variable
+                 Craftable craftable = null;
+                 foreach (Item item in givenItems)
+                 {
+                     craftable = item as Craftable;
+                     if (craftable != null)
+                     {
+                         givenItems.Remove(craftable);
+                         break;
+                     }
+                 }
+                 // if none of the items is a craftable display an error message and stop
+                 if (craftable != null)
+                 {
+                     // use the craft method of the craftable and pass it the other items left in the list
+                     Item product = craftable.Craft(givenItems);
+                     // if it returns null the give an error message and stop the operation
+                     if (product != null)
+                     {
+                         // remove the items in the temporary list and the craftable from the inventory
+                         foreach (Item item in givenItems)
+                             inventory.Remove(item);
+                         inventory.Remove(craftable);
+                         // add the returned item to the player's inventory
+                         inventory.Add(product);
+                         Console.WriteLine("\nYou created: " + product.ToString() + "!");
+                     }
+                     else
+                     {
+                         Console.WriteLine("\nThese Items don't work together.");
+                     }
+                 }
+                 else
+                 {
+                     Console.WriteLine("\nThese Items don't work together.");
+                 }
+             }
+        }*/
 
         private bool useKey(List<string> commandList)
         {
@@ -273,7 +243,7 @@ namespace TextAdventure
             }
             return false;
         }
-
+        
         private bool inspectInventory(string itemName, List<Item> searchInventory)
         {
             // inspect an inventory and write the description of the item if found, else return false
@@ -357,7 +327,7 @@ namespace TextAdventure
                 Console.WriteLine();
             }
         }
-        
+
         private void showInventory()
 		{
 			if ( inventory.Count > 0 )
@@ -376,6 +346,32 @@ namespace TextAdventure
 
 			Console.WriteLine("");
 		}
+
+		public void showLocation()
+		{
+			Console.WriteLine("\n" + currentLocation.getTitle() + "\n");
+			Console.WriteLine(currentLocation.getDescription());
+
+			if (currentLocation.getInventory().Count > 0)
+			{
+				Console.WriteLine("\nThe room contains the following:\n");
+
+				for ( int i = 0; i < currentLocation.getInventory().Count; i++ )
+				{
+					Console.WriteLine(currentLocation.getInventory()[i].ItemName);
+				}
+			}
+	
+			Console.WriteLine("\nAvailable Exits: \n");
+
+			foreach (Exit exit in currentLocation.getExits() )
+			{
+				Console.WriteLine(exit.getDirection());
+			}
+
+			Console.WriteLine();
+		}
+        #endregion
 
 		public void Update()
 		{
