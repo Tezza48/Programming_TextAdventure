@@ -81,20 +81,6 @@ namespace TextAdventure
 			}
 		}
 
-		public Item takeItem(string name)
-		{
-			foreach ( Item item in inventory )
-			{
-                if (item.ToString() == name)
-				{
-					inventory.Remove(item);
-					return item;
-				}
-			}
-
-			return null;
-		}
-
 		public string getTitle()
 		{
 			return roomTitle;

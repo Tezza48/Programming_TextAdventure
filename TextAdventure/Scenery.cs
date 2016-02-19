@@ -6,22 +6,25 @@ using System.Threading.Tasks;
 
 namespace TextAdventure
 {
-    /*class Tool : Item
+    class Scenery : Item
     {
-        private Craftable itemUsedOn;
+        // an item that cannot be taken
 
-        public Tool()
+        private string longDescription;
+
+        public Scenery()
         {
             itemName = "";
             itemDescription = "";
-            itemUsedOn = null;
+            longDescription = "";
         }
 
-        public Tool(string name, string description, Craftable _itemUsedOn)
+        public Scenery (string name, string description, string lDescription)
         {
             itemName = name;
             itemDescription = description;
-            itemUsedOn = _itemUsedOn;
+            longDescription = lDescription;
         }
-    }*/
+
+    }
 }

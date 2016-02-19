@@ -15,22 +15,32 @@ namespace TextAdventure
 
 		public static string[] shortDirections = {"Null", "N", "S", "E", "W", "U", "D", "NE", "NW", "SE", "SW", "I", "O"};
 
-		protected Location leadsTo;
-		protected Directions direction;
+		private Location leadsTo;
+		private Directions direction;
+        private Key key;
 
 		public Exit()
 		{
 			direction = Directions.Undefined;
 			leadsTo = null;
+            key = null;
 		}
 
-		public Exit(Directions _direction, Location newLeadsTo)
-		{
-			direction = _direction;
-			leadsTo = newLeadsTo;
-		}
+        public Exit(Directions _direction, Location newLeadsTo)
+        {
+            direction = _direction;
+            leadsTo = newLeadsTo;
+            key = null;
+        }
 
-		public override string ToString()
+        public Exit(Directions _direction, Location newLeadsTo, Key _key)
+        {
+            direction = _direction;
+            leadsTo = newLeadsTo;
+            key = _key;
+        }
+
+        public override string ToString()
 		{
 			return direction.ToString();
 		}

@@ -28,6 +28,7 @@ namespace TextAdventure
 		public bool isRunning = true;
 
 		private List<Item> inventory; // the player's inventory
+        private List<string> splitterWords = new List<string> {"the"};
 
 		public Game()
 		{
@@ -39,28 +40,14 @@ namespace TextAdventure
             // add locations and items
             
 			Location l1 = new Location("Entrance to hall", "You stand at the entrance of a long hallway. The hallways gets darker\nand darker, and you cannot see what lies beyond. To the east\nis an old oaken door, unlocked and beckoning.");
-            Key rock = new Key("Rock", "It's a rock!", true);// smashes the window in l2
-            Craftable mummy = new Craftable("Mummy", "");
-            Item daddy = new Item("Daddy");
-            Item baby = new Item("Baby");
-            List<Item> daddyList = new List<Item>();
-            daddyList.Add(daddy);
-            Recipe business = new Recipe(daddyList, baby);
-            mummy.Recipie = business;
+            Key rock = new Key("Rock", "It's a rock!", true);// smashes the window in l2y);
             l1.addItem(rock);
-            l1.addItem(mummy);
-            l1.addItem(daddy);
 
 			Location l2 = new Location("End of hall", "You have reached the end of a long dark hallway. You can\nsee a window above a bookcase to your left.");
-            Item openWindow = new Item("Smashed_Window", "A small, now opened window");
-			Lock window = new Lock("Window", "A small, fragile window", "you smashed the glass and opened the window", rock, Exit.Directions.Up, openWindow);
 
 			Location l3 = new Location("Small study", "This is a small and cluttered study, containing a desk covered with\npapers. Though they no doubt are of some importance,\nyou cannot read their writing");
-            Item letter = new Item("Closed_Letter", "An old letter, closed with a wax seal");
 
             Location l4 = new Location("Ledge", "A ledge high above the ground, leading round to the West wing.");
-            window.LockedLocation = l4;
-			l2.addItem(window);
 
             // add exits
 			l1.addExit(new Exit(Exit.Directions.North, l2));
@@ -129,127 +116,38 @@ namespace TextAdventure
 
             */
             #endregion
-            Dictionary<string, CommandType> VerbCommands = new Dictionary<string, CommandType>
+            /*Dictionary<string, CommandType> VerbCommands = new Dictionary<string, CommandType>
             {
                 { "use", CommandType.Use },
                 { "take", CommandType.Take },
                 { "look", CommandType.Look },
                 { "move", CommandType.Move },
                 { "walk", CommandType.Move }
-            };
-            string[] wordList = command.Split(' ');
+            };*/
+            List<string> commandList = splitCommands(command);
         }
 
-        #region CommandMethods
-        /* private void craftItem(List<string> commandList)
-         {
-             // search the player's inventory for the items and make a temporary list of these items
-             List<Item> givenItems = new List<Item>();
-             bool validItems = true;
-             foreach (string givenItem in commandList)
-             {
-                 bool found = false;
-                 foreach (Item currentItem in inventory)
-                 {
-                     if (currentItem.ToString() == givenItem)
-                     {
-                         found = true;
-                         givenItems.Add(currentItem);
-                         continue;
-                     }
-                 }
-                 if (!found)
-                 {
-                     Console.WriteLine("\nYou don't have a \"" + givenItem + "\" in your bag");
-                     validItems = false;
-                     break;
-                 }
-             }
-             if (validItems)
-             {
-                 // remove the craftable from the list and give it a separate variable
-                 Craftable craftable = null;
-                 foreach (Item item in givenItems)
-                 {
-                     craftable = item as Craftable;
-                     if (craftable != null)
-                     {
-                         givenItems.Remove(craftable);
-                         break;
-                     }
-                 }
-                 // if none of the items is a craftable display an error message and stop
-                 if (craftable != null)
-                 {
-                     // use the craft method of the craftable and pass it the other items left in the list
-                     Item product = craftable.Craft(givenItems);
-                     // if it returns null the give an error message and stop the operation
-                     if (product != null)
-                     {
-                         // remove the items in the temporary list and the craftable from the inventory
-                         foreach (Item item in givenItems)
-                             inventory.Remove(item);
-                         inventory.Remove(craftable);
-                         // add the returned item to the player's inventory
-                         inventory.Add(product);
-                         Console.WriteLine("\nYou created: " + product.ToString() + "!");
-                     }
-                     else
-                     {
-                         Console.WriteLine("\nThese Items don't work together.");
-                     }
-                 }
-                 else
-                 {
-                     Console.WriteLine("\nThese Items don't work together.");
-                 }
-             }
-        }*/
-
-        private bool useKey(List<string> commandList)
+        private List<string> splitCommands(string _command)
         {
-            // find the lock in the currentLocation corresponding with the third command
-            foreach (Item currentLockItem in currentLocation.getInventory())
+            List<string> commandList = _command.Split(' ').ToList();
+            foreach (string command in commandList)
             {
-                Lock currentLock = currentLockItem as Lock;
-                if (currentLock != null)
+                foreach (string removable in splitterWords)
                 {
-                    if (currentLock.ToString() == commandList[2])// this lock is the one specified
+                    if (command == removable)
                     {
-                        // if it's key is in the player's inventory
-                        foreach (Item currentKeyItem in inventory)
-                        {
-                            Key currentKey = currentKeyItem as Key;
-                            if (currentKey != null)
-                            {
-                                if (currentKey.ToString() == commandList[1])
-                                {
-                                    Tuple<bool, Exit.Directions, Location, string, Item> unlock = currentLock.Unlock(currentKey);
-                                    if (unlock.Item1)
-                                    {
-                                        // remove the lock from the currentLocation's inventory
-                                        currentLocation.removeItem(currentLock);
-                                        // add the lock's alternative item to the currentLocation's inventory
-                                        currentLocation.addItem(unlock.Item5);
-                                        // add an exit to the current location leading to the Lock's location
-                                        currentLocation.addExit(new Exit(unlock.Item2, unlock.Item3));
-                                        // display the lock's unlocking message
-                                        Console.WriteLine(unlock.Item5);
-                                        Console.WriteLine();
-                                        // return once unlocked
-                                        return true;
-                                    }
-                                    else
-                                    {
-                                        return false;
-                                    }
-                                }
-                            }
-                        }
+                        commandList.Remove(command);
                     }
                 }
             }
-            return false;
+            return commandList;
+        }
+
+        #region CommandMethods
+
+        private void useKey(Key _key, Exit _exit)
+        {
+            
         }
         
         private bool inspectInventory(string itemName, List<Item> searchInventory)
@@ -293,46 +191,16 @@ namespace TextAdventure
             }
         }
         
-        private void takeItem(List<string> commandList)
+        private void takeItem(string itemName)
         {
-            // try to take all commands after take
-            for (int itemCount = 1; itemCount < commandList.Count; itemCount++)
+            foreach (Item item in currentLocation.getInventory())
             {
-                if (currentLocation.getInventory().Count() > 0)
+                if (item.ToString().Equals(itemName))
                 {
-                    // is this command an item in the location
-                    bool isItem = false;
-                    // for each item specified after the command
-                    foreach (Item item in currentLocation.getInventory())
-                    {
-                        // look through the inventory for that item
-                        if (item.ToString().Equals(commandList[itemCount]))
-                        {
-                            if (item.GetType() != typeof(Lock))
-                            {
-                                // TODO add to a sorted position
-                                inventory.Add(currentLocation.takeItem(commandList[itemCount]));
-                                Console.WriteLine("You took the " + item.ToString() + ".");
-                                isItem = true;
-                                break;
-                            }
-                            else
-                            {
-                                isItem = true;
-                                Console.WriteLine("You cant take the " + item.ToString() + ".");
-                            }
-                        }
-                    }
-                    if (!isItem)
-                    {
-                        Console.WriteLine("\"" + commandList[itemCount] + "\" is not an item you can take.");
-                    }
+                    inventory.Add(item);
+                    currentLocation.removeItem(item);
+                    Console.WriteLine("You took the {0}!", item.ItemName);
                 }
-                else
-                {
-                    Console.WriteLine("\nThere are no items here.");
-                }
-                Console.WriteLine();
             }
         }
 

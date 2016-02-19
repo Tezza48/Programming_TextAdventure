@@ -44,19 +44,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InputHandler.cs" />
-    <Compile Include="Items\Craftable.cs" />
     <Compile Include="Exit.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Inventory.cs" />
     <Compile Include="Items\Item.cs" />
     <Compile Include="Items\Key.cs" />
     <Compile Include="Location.cs" />
-    <Compile Include="Items\Lock.cs" />
-    <Compile Include="Items\Multitool.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Items\Tool.cs" />
     <Compile Include="Recipe.cs" />
+    <Compile Include="Scenery.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
