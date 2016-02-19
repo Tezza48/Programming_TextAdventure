@@ -129,7 +129,15 @@ namespace TextAdventure
 
             */
             #endregion
-            Dictionary<string, CommandType> Commands = new Dictionary<string, CommandType> { { "use", CommandType.Use}, {} };
+            Dictionary<string, CommandType> VerbCommands = new Dictionary<string, CommandType>
+            {
+                { "use", CommandType.Use },
+                { "take", CommandType.Take },
+                { "look", CommandType.Look },
+                { "move", CommandType.Move },
+                { "walk", CommandType.Move }
+            };
+            string[] wordList = command.Split(' ');
         }
 
         #region CommandMethods
