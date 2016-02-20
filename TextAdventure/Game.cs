@@ -28,11 +28,11 @@ namespace TextAdventure
 		public bool isRunning = true;
 
 		private List<Item> inventory; // the player's inventory
-        private List<string> splitterWords = new List<string> {"the"};
+        private List<string> splitterWords = new List<string> { "the", "with", "on", "and", "at", "room", "my"};
 
-		public Game()
+        public Game()
 		{
-			inventory = new List<Item>();
+            inventory = new List<Item>();
 
 			Console.WriteLine("Welcome adventurer, prepare yourself for a fantastical journey into the unknown.");
 
@@ -116,28 +116,61 @@ namespace TextAdventure
 
             */
             #endregion
-            /*Dictionary<string, CommandType> VerbCommands = new Dictionary<string, CommandType>
-            {
-                { "use", CommandType.Use },
-                { "take", CommandType.Take },
-                { "look", CommandType.Look },
-                { "move", CommandType.Move },
-                { "walk", CommandType.Move }
-            };*/
+
+            #region InputAlgorithm
+
+            CommandType currentCommand;
+
             List<string> commandList = splitCommands(command);
+
+            // parse single commands
+            if (commandList.Count == 1)
+            {
+                // check for a direction
+                foreach (Exit currentExit in currentLocation.getExits())
+                {
+                    if (currentExit.ToString().ToLower().Equals(command) || currentExit.getShortDirection().Equals(command))
+                    {
+                        moveToLocation(currentExit.getLeadsTo());
+                        return;
+                    }
+                }
+                // check for a single command verb
+                switch (command)
+                {
+                    case "look":
+                        showLocation();
+                        return;
+                    case "inventory":
+                        showInventory();
+                        return;
+                    default:
+                        Console.WriteLine("I don't understand \"{0}\", are you confused?\n", command);
+                        return;
+                }
+            }
+            #endregion
+
+
+            #region SplitDebug
+            /*
+            foreach (string splitComm in commandList)
+            {
+                Console.Write(splitComm + "\t");
+            }
+            Console.WriteLine();
+            */
+            #endregion
         }
 
         private List<string> splitCommands(string _command)
         {
             List<string> commandList = _command.Split(' ').ToList();
-            foreach (string command in commandList)
+            foreach (string removable in splitterWords)
             {
-                foreach (string removable in splitterWords)
+                if (commandList.Contains(removable))
                 {
-                    if (command == removable)
-                    {
-                        commandList.Remove(command);
-                    }
+                    commandList.RemoveAll(item => item == removable);
                 }
             }
             return commandList;
@@ -148,6 +181,12 @@ namespace TextAdventure
         private void useKey(Key _key, Exit _exit)
         {
             
+        }
+
+        private void moveToLocation(Location newLocation)
+        {
+            currentLocation = newLocation;
+            showLocation();
         }
         
         private bool inspectInventory(string itemName, List<Item> searchInventory)
@@ -164,31 +203,6 @@ namespace TextAdventure
                 }
             }
             return false;
-        }
-
-        private void moveToLocation(List<string> commandList)
-        {
-            // check if it contains one more word
-            if (commandList.Count == 2)
-            {
-                // check the second word aginst all other exits
-                foreach (Exit exit in currentLocation.getExits())
-                {
-                    bool longCommand = commandList[1].Equals(exit.ToString().ToLower());
-                    bool shortCommand = commandList[1].Equals(exit.getShortDirection());
-                    if (longCommand || shortCommand)
-                    {
-                        // go to that location
-                        currentLocation = exit.getLeadsTo();
-                        showLocation();
-                        break;
-                    }
-                    else
-                    {
-                        Console.WriteLine("\n\"" + commandList[1] + "\" Is not a valid direction. \nare you confused?\n");
-                    }
-                }
-            }
         }
         
         private void takeItem(string itemName)
