@@ -1,14 +1,11 @@
-﻿using System;
+﻿#define DEBUG_INPUT
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-/*
-    TODO:
-    use a more sophisticated sorting algorithm for searching the inventory and adding items
-    Sort the items in the Take Command
-*/
 
 namespace TextAdventure
 {
@@ -23,7 +20,7 @@ namespace TextAdventure
     }
 	class Game
 	{
-		Location currentLocation;
+        Location currentLocation;
 
 		public bool isRunning = true;
 
@@ -117,12 +114,25 @@ namespace TextAdventure
             */
             #endregion
 
-            #region InputAlgorithm
-
             CommandType currentCommand;
 
             List<string> commandList = splitCommands(command);
 
+            #if DEBUG_INPUT
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            for (int i = 0; i < commandList.Count(); i++)
+            {
+                Console.Write(commandList[i]);
+                if (i + 1 != commandList.Count())
+                {
+                    Console.Write(",\t");
+                }
+            }
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.White;
+            #endif
+
+            #region SingleCommands
             // parse single commands
             if (commandList.Count == 1)
             {
@@ -151,15 +161,12 @@ namespace TextAdventure
             }
             #endregion
 
-
-            #region SplitDebug
-            /*
-            foreach (string splitComm in commandList)
+            #region ComplexCommands
+            // parse complex commands
+            else
             {
-                Console.Write(splitComm + "\t");
+
             }
-            Console.WriteLine();
-            */
             #endregion
         }
 
