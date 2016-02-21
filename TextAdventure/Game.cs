@@ -11,12 +11,14 @@ namespace TextAdventure
 {
     enum CommandType
     {
-        Use,
-        Take,
+        Undefined,
+        Help,
+        Inventory,
         Look,
         Move,
-        Inventory,
-        Help
+        Take,
+        Use,
+        ERROR
     }
 	class Game
 	{
@@ -25,7 +27,14 @@ namespace TextAdventure
 		public bool isRunning = true;
 
 		private List<Item> inventory; // the player's inventory
-        private List<string> splitterWords = new List<string> { "the", "with", "on", "and", "at", "room", "my"};
+
+        //
+        private List<string> splitterWords = new List<string> { "the", "with", "on", "and", "at", "room", "my", "is"};
+        Dictionary<string, CommandType> VerbCommands = new Dictionary<string, CommandType>
+            {
+                { "use", CommandType.Use }, { "take", CommandType.Take }, { "look", CommandType.Look },
+                { "move", CommandType.Move }, { "walk", CommandType.Move }, { "help", CommandType.Help }
+            };
 
         public Game()
 		{
@@ -114,21 +123,21 @@ namespace TextAdventure
             */
             #endregion
 
-            CommandType currentCommand;
+            CommandType currentCommand = CommandType.Undefined;
 
             List<string> commandList = splitCommands(command);
 
-            #if DEBUG_INPUT
+            #if DEBUG
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             for (int i = 0; i < commandList.Count(); i++)
             {
                 Console.Write(commandList[i]);
                 if (i + 1 != commandList.Count())
                 {
-                    Console.Write(",\t");
+                    Console.Write("\t|");
                 }
             }
-            Console.WriteLine();
+            Console.WriteLine("\n");
             Console.ForegroundColor = ConsoleColor.White;
             #endif
 
@@ -145,6 +154,7 @@ namespace TextAdventure
                         return;
                     }
                 }
+
                 // check for a single command verb
                 switch (command)
                 {
@@ -154,8 +164,11 @@ namespace TextAdventure
                     case "inventory":
                         showInventory();
                         return;
+                    case "help":
+                        displayHelp();
+                        return;
                     default:
-                        Console.WriteLine("I don't understand \"{0}\", are you confused?\n", command);
+                        Console.WriteLine("I don't understand {0}, are you confused?\n", command);
                         return;
                 }
             }
@@ -165,6 +178,52 @@ namespace TextAdventure
             // parse complex commands
             else
             {
+                // search through the verb dictionary to find a verb
+                foreach (string currentVerb in VerbCommands.Keys)
+                {
+                    if (commandList.Contains(currentVerb))
+                    {
+                        // set the current verp type and remove it from the list.
+                        currentCommand = VerbCommands[currentVerb];
+                        commandList.Remove(currentVerb);
+                        break;
+                    }
+                    else
+                    {
+                        currentCommand = CommandType.ERROR;
+                    }
+                }
+
+                switch (currentCommand)
+                {
+                    case CommandType.Undefined:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Something went wrong in the code. Sorry.");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        break;
+                    case CommandType.Help:
+                        displayHelp();
+                        break;
+                    case CommandType.Inventory:
+                        inspectInventory(commandList, inventory);
+                        break;
+                    case CommandType.Look:
+                        inspectInventory(commandList, currentLocation.getInventory());
+                        inspectInventory(commandList, inventory);
+                        break;
+                    case CommandType.Move:
+                        moveToLocation(commandList);
+                        break;
+                    case CommandType.Take:
+                        takeItem(commandList);
+                        break;
+                    case CommandType.Use:
+                        useKey(commandList);
+                        break;
+                    case CommandType.ERROR:
+                        Console.WriteLine("I don't understand that, maybe you could re-phrase it.");
+                        break;
+                }
 
             }
             #endregion
@@ -184,47 +243,36 @@ namespace TextAdventure
         }
 
         #region CommandMethods
-
-        private void useKey(Key _key, Exit _exit)
+        // display the help message to the console
+        private void displayHelp()
         {
-            
+            Console.WriteLine("You think you need help? I had to make this!\nThe cheek of some people!");
         }
 
-        private void moveToLocation(Location newLocation)
-        {
-            currentLocation = newLocation;
-            showLocation();
-        }
-        
-        private bool inspectInventory(string itemName, List<Item> searchInventory)
+        // write the discriptions of the specified items in the respective inventory in the console
+        private void inspectInventory(List<string> items, List<Item> searchInventory)
         {
             // inspect an inventory and write the description of the item if found, else return false
             // check if that item is in your inventory.
             foreach (Item currentItem in searchInventory)
             {
-                if (currentItem.ToString().Equals(itemName))
+                if (items.Contains(currentItem.ToString()))
                 {
-                    // write the item's description to the output stream
                     Console.WriteLine(currentItem.ItemDescription + "\n");
-                    return true;
+                    items.Remove(currentItem.ToString());
                 }
             }
-            return false;
-        }
-        
-        private void takeItem(string itemName)
-        {
-            foreach (Item item in currentLocation.getInventory())
+            if (items.Count() < 0)
             {
-                if (item.ToString().Equals(itemName))
+                foreach (string badItem in items)
                 {
-                    inventory.Add(item);
-                    currentLocation.removeItem(item);
-                    Console.WriteLine("You took the {0}!", item.ItemName);
+                    Console.Write("{0}, ", badItem);
                 }
+                Console.WriteLine("could not be taken.\n");
             }
         }
 
+        // display the player's inventory in the console
         private void showInventory()
 		{
 			if ( inventory.Count > 0 )
@@ -244,9 +292,15 @@ namespace TextAdventure
 			Console.WriteLine("");
 		}
 
+        // write the current location's title, description items and exits to the console
 		public void showLocation()
 		{
-			Console.WriteLine("\n" + currentLocation.getTitle() + "\n");
+            #if DEBUG
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine("This is a debug build.\nAnything in dark cyan is a debug message.");
+            Console.ForegroundColor = ConsoleColor.White;
+            #endif
+            Console.WriteLine("\n" + currentLocation.getTitle() + "\n");
 			Console.WriteLine(currentLocation.getDescription());
 
 			if (currentLocation.getInventory().Count > 0)
@@ -268,6 +322,74 @@ namespace TextAdventure
 
 			Console.WriteLine();
 		}
+
+        // change to current location to another one
+        private void moveToLocation(Location newLocation)
+        {
+            currentLocation = newLocation;
+            showLocation();
+        }
+        // find a location from the exit matching the given string and use the above method to move to that location
+        private void moveToLocation(List<string> newLocation)
+        {
+            // make sure there was only one command left after formatting
+            if (newLocation.Count == 1)
+            {
+                // check the location for the exit specified
+                foreach (Exit currentExit in currentLocation.getExits())
+                {
+                    if (currentExit.ToString().ToLower().Equals(newLocation[0]) || currentExit.getShortDirection().Equals(newLocation[0]))
+                    {
+                        // change the loaction to the exit's location
+                        moveToLocation(currentExit.getLeadsTo());
+                        // return out of the method
+                        return;
+                    }
+                }
+                // This error is written only if the above cannot find an exit matching the command
+                Console.WriteLine("I cant go {0} from here.", newLocation[0]);
+            }
+            else
+            {
+                Console.WriteLine("I cant be in two places at once!");
+            }
+        }
+
+        // tries to take all items asked for and add them to the player's inventory
+        private void takeItem(List<string> items)
+        {
+            bool isItem;
+            foreach (string item in items)
+            {
+                isItem = false;
+                foreach (Item inventoryItem in currentLocation.getInventory())
+                {
+                    // make sure it's not a scenery item
+                    if (inventoryItem.GetType() != typeof(Scenery))
+                    {
+                        string itemString = inventoryItem.ToString();
+                        if (item == itemString)
+                        {
+                            isItem = true;
+                            inventory.Add(inventoryItem);
+                            currentLocation.removeItem(inventoryItem);
+                            Console.WriteLine("You took the {0}", inventoryItem.ItemName);
+                        }
+                    }
+                }
+                if (!isItem)
+                {
+                    Console.WriteLine("{0} isn't an item you can take.", item);
+                }
+            }
+        }
+
+        // unlock a preveously locked exit
+        private void useKey(List<string> commandList)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
 		public void Update()
