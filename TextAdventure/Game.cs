@@ -1,5 +1,5 @@
-﻿#define DEBUG_INPUT
-
+﻿#define DEBUG
+#undef DEBUG
 
 using System;
 using System.Collections.Generic;
@@ -60,7 +60,7 @@ namespace TextAdventure
 
             l1_a1.addExit(new Exit(Exit.Directions.North, l1_a2));
 
-            l1_a2.addExit(new Exit(Exit.Directions.South, l1_a2));
+            l1_a2.addExit(new Exit(Exit.Directions.South, l1_a1));
             l1_a2.addExit(new Exit(Exit.Directions.North, l2_a1));
 
             l2_a1.addExit(new Exit(Exit.Directions.South, l1_a2));
@@ -70,7 +70,7 @@ namespace TextAdventure
 
             currentLocation = l1_a1;
 
-            showLocation();
+            showLocation(false);
 		}
 
 
@@ -214,7 +214,7 @@ namespace TextAdventure
                         inspectInventory(commandList, inventory);
                         break;
                     case CommandType.Move:
-                        moveToLocation(commandList);
+                        if (commandList.Count == 1) moveToLocation(commandList[0]);
                         break;
                     case CommandType.Take:
                         takeItem(commandList);
@@ -255,7 +255,8 @@ namespace TextAdventure
         // display the help message to the console
         private void displayHelp()
         {
-            Console.WriteLine("You think you need help? I had to make this!\nThe cheek of some people!");
+            Console.WriteLine("Here is a list of verbs/commands I understand:\n\tUse\n\tTake\n\tLook\n\tMove/Walk\n\tTake\n\tQuit\nAnd of course: Help.");
+            Console.WriteLine("You can also type the direction you want to move in \nor even just the first letter of that direction in some cases.\n");
         }
 
         // write the discriptions of the specified items in the respective inventory in the console
@@ -302,8 +303,9 @@ namespace TextAdventure
 		}
 
         // write the current location's title, description items and exits to the console
-		public void showLocation()
+		public void showLocation(bool clear = true)
 		{
+            if (clear) Console.Clear();
             #if DEBUG
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.WriteLine("This is a debug build.\nAnything in dark cyan is a debug message.");
@@ -340,6 +342,9 @@ namespace TextAdventure
             {
                 currentLocation = targetExit.getLeadsTo();
                 showLocation();
+                #if ANNOYING
+                Console.Beep();
+                #endif
             }
             else
             {
@@ -347,29 +352,33 @@ namespace TextAdventure
             }
         }
         // find a location from the exit matching the given string and use the above method to move to that location
-        private void moveToLocation(List<string> newLocation)
+        private void moveToLocation(string newLocation)
         {
-            // make sure there was only one command left after formatting
-            if (newLocation.Count == 1)
+            // check the location for the exit specified
+            Exit targetExit = findExit(newLocation);
+            if (targetExit != null)
             {
-                // check the location for the exit specified
-                foreach (Exit currentExit in currentLocation.getExits())
-                {
-                    if (currentExit.ToString().ToLower().Equals(newLocation[0]) || currentExit.getShortDirection().Equals(newLocation[0]))
-                    {
-                        // change the loaction to the exit's location
-                        moveToLocation(currentExit);
-                        // return out of the method
-                        return;
-                    }
-                }
-                // This error is written only if the above cannot find an exit matching the command
-                Console.WriteLine("I cant go {0} from here.", newLocation[0]);
+                // change the loaction to the exit's location
+                moveToLocation(targetExit);
+                // return out of the method
+                return;
             }
             else
             {
-                Console.WriteLine("I cant be in two places at once!");
+                Console.WriteLine("I cant go {0} from here.", newLocation);
             }
+            //foreach (Exit currentExit in currentLocation.getExits())
+            //{
+            //    if (currentExit.ToString().ToLower().Equals(newLocation[0]) || currentExit.getShortDirection().Equals(newLocation[0]))
+            //    {
+            //        // change the loaction to the exit's location
+            //        moveToLocation(currentExit);
+            //        // return out of the method
+            //        return;
+            //    }
+            //}
+            // This error is written only if the above cannot find an exit matching the command
+            // Console.WriteLine("I cant go {0} from here.", newLocation[0]);
         }
 
         // tries to take all items asked for and add them to the player's inventory
@@ -449,7 +458,7 @@ namespace TextAdventure
             return currentLocation.getExits().Find(strExit => strExit.ToString().ToLower().Equals(exitName) || strExit.getShortDirection().ToLower().Equals(exitName));
         }
 
-        #endregion
+#endregion
 
         public void Update()
 		{
