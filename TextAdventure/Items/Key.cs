@@ -15,6 +15,8 @@ namespace TextAdventure
 
         private bool isDestroyedOnUse;
 
+        public bool IsDestroyedOnUse { get { return isDestroyedOnUse; } set { isDestroyedOnUse = value; } }
+
         public Key()
         {
             itemName = "";

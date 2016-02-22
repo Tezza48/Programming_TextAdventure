@@ -56,7 +56,7 @@ namespace TextAdventure
             Location l4 = new Location("Ledge", "A ledge high above the ground, leading round to the West wing.");
 
             // add exits
-			l1.addExit(new Exit(Exit.Directions.North, l2));
+			l1.addExit(new Exit(Exit.Directions.North, l2, rock));
 			l1.addExit(new Exit(Exit.Directions.East, l3));
 
 			l2.addExit(new Exit(Exit.Directions.South, l1));
@@ -150,7 +150,7 @@ namespace TextAdventure
                 {
                     if (currentExit.ToString().ToLower().Equals(command) || currentExit.getShortDirection().Equals(command))
                     {
-                        moveToLocation(currentExit.getLeadsTo());
+                        moveToLocation(currentExit);
                         return;
                     }
                 }
@@ -218,7 +218,14 @@ namespace TextAdventure
                         takeItem(commandList);
                         break;
                     case CommandType.Use:
-                        useKey(commandList);
+                        switch (commandList.Count)
+                        {
+                            case 2:
+                                useKey(commandList);
+                                break;
+                            default:
+                                break;
+                        }
                         break;
                     case CommandType.ERROR:
                         Console.WriteLine("I don't understand that, maybe you could re-phrase it.");
@@ -324,10 +331,18 @@ namespace TextAdventure
 		}
 
         // change to current location to another one
-        private void moveToLocation(Location newLocation)
+        private void moveToLocation(Exit targetExit)
         {
-            currentLocation = newLocation;
-            showLocation();
+            // if that exit isn't locked
+            if (targetExit.Key == null)
+            {
+                currentLocation = targetExit.getLeadsTo();
+                showLocation();
+            }
+            else
+            {
+                Console.WriteLine("That exit is Locked");
+            }
         }
         // find a location from the exit matching the given string and use the above method to move to that location
         private void moveToLocation(List<string> newLocation)
@@ -341,7 +356,7 @@ namespace TextAdventure
                     if (currentExit.ToString().ToLower().Equals(newLocation[0]) || currentExit.getShortDirection().Equals(newLocation[0]))
                     {
                         // change the loaction to the exit's location
-                        moveToLocation(currentExit.getLeadsTo());
+                        moveToLocation(currentExit);
                         // return out of the method
                         return;
                     }
@@ -387,12 +402,50 @@ namespace TextAdventure
         // unlock a preveously locked exit
         private void useKey(List<string> commandList)
         {
-            throw new NotImplementedException();
+            // Input a list of strings
+            // list should contain a item's name and an exit's name
+
+            // find the item in the player's inventory
+            // the lambda expression checks the first string in commandList against each item's ToString() value
+            Key keyItem = inventory.Find(strName => strName.ToString().Equals(commandList[0])) as Key;
+            // find the exit in the currentLocation
+            Exit targetExit = findExit(commandList[1]);
+            // ceck that both were found
+            if (keyItem != null && targetExit != null)
+            {
+                // if the currentLocation's key item == the item found, unlock the exit.
+                if (targetExit.Key.Equals(keyItem))
+                {
+                    targetExit.Key = null;
+                    Console.WriteLine("You unlocked the {0} exit with the {1}!", targetExit.getDirection().ToString(), keyItem.ItemName);
+                    if (keyItem.IsDestroyedOnUse)
+                    {
+                        inventory.Remove(keyItem);
+                        Console.WriteLine("{0} was destroyed.", keyItem.ItemName);
+                    }
+                    Console.WriteLine();
+                }
+                else
+                {
+                    Console.WriteLine("You cant use that item like that!");
+                }
+
+            }
+            // Unlocking
+            // remove the key from the exit
+            // if the key is destroyed on use, destroy it
+        }
+
+        // returns an exit matching the given string
+        private Exit findExit(string exitName)
+        {
+            // the predicate alows me to find the exit with a string
+            return currentLocation.getExits().Find(strExit => strExit.ToString().Equals(exitName) || strExit.getShortDirection().ToLower().Equals(exitName));
         }
 
         #endregion
 
-		public void Update()
+        public void Update()
 		{
 
 			string currentCommand = Console.ReadLine().ToLower();

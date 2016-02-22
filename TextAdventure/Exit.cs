@@ -19,7 +19,9 @@ namespace TextAdventure
 		private Directions direction;
         private Key key;
 
-		public Exit()
+        internal Key Key { get { return key; } set { key = value; } }
+
+        public Exit()
 		{
 			direction = Directions.Undefined;
 			leadsTo = null;
