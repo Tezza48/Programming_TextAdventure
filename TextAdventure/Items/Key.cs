@@ -24,6 +24,13 @@ namespace TextAdventure
             isDestroyedOnUse = true;
         }
 
+        public Key(string name, bool _isDestroyedOnUse)
+        {
+            itemName = name;
+            itemDescription = "";
+            isDestroyedOnUse = _isDestroyedOnUse;
+        }
+
         public Key(string name, string description, bool _isDestroyedOnUse)
         {
             itemName = name;

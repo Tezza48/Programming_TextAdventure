@@ -44,31 +44,33 @@ namespace TextAdventure
 
             // build the "map"
             // add locations and items
-            
-			Location l1 = new Location("Entrance to hall", "You stand at the entrance of a long hallway. The hallways gets darker\nand darker, and you cannot see what lies beyond. To the east\nis an old oaken door, unlocked and beckoning.");
-            Key rock = new Key("Rock", "It's a rock!", true);// smashes the window in l2y);
-            l1.addItem(rock);
+            // currently items must only be one word, spaces will break them
 
-			Location l2 = new Location("End of hall", "You have reached the end of a long dark hallway. You can\nsee a window above a bookcase to your left.");
+            Location l1_a1 = new Location("The Car", "You are at the end of a long alleyway, behind the car is a sheer drop, best not go that way.");// crashed car
+            Key l1_screwDriver = new Key("ScrewDriver", "This might come in handy.", false);
+            l1_a1.addItem(l1_screwDriver);
 
-			Location l3 = new Location("Small study", "This is a small and cluttered study, containing a desk covered with\npapers. Though they no doubt are of some importance,\nyou cannot read their writing");
+            Location l1_a2 = new Location("The Alleyway", "A dark alleyway leading north to a gate and south to the car.");
+            Key l1_brokenPipe = new Key("BrokenPipe", "A piece of steel piping, it looks like it broke off of the piping above.", true);
+            l1_a2.addItem(l1_brokenPipe);
 
-            Location l4 = new Location("Ledge", "A ledge high above the ground, leading round to the West wing.");
+            Location l2_a1 = new Location("End of the alleyway");// gate at end locking the exit
 
-            // add exits
-			l1.addExit(new Exit(Exit.Directions.North, l2, rock));
-			l1.addExit(new Exit(Exit.Directions.East, l3));
+            Location l3_a1 = new Location("Barricaded Street", "A wide street with barricades not far east and west blocking the roads. The street is surrounded by tall buildings.");
 
-			l2.addExit(new Exit(Exit.Directions.South, l1));
+            l1_a1.addExit(new Exit(Exit.Directions.North, l1_a2));
 
-			l3.addExit(new Exit(Exit.Directions.West, l1));
-            
+            l1_a2.addExit(new Exit(Exit.Directions.South, l1_a2));
+            l1_a2.addExit(new Exit(Exit.Directions.North, l2_a1));
 
-             currentLocation = l1;
+            l2_a1.addExit(new Exit(Exit.Directions.South, l1_a2));
+            l2_a1.addExit(new Exit(Exit.Directions.North, l3_a1, l1_brokenPipe));
 
-            // Location C1L1 = new Location("");
+            l3_a1.addExit(new Exit(Exit.Directions.South, l2_a1));
 
-			showLocation();
+            currentLocation = l1_a1;
+
+            showLocation();
 		}
 
 
@@ -431,6 +433,10 @@ namespace TextAdventure
                 }
 
             }
+            else
+            {
+                Console.WriteLine("That won't work.");
+            }
             // Unlocking
             // remove the key from the exit
             // if the key is destroyed on use, destroy it
@@ -440,7 +446,7 @@ namespace TextAdventure
         private Exit findExit(string exitName)
         {
             // the predicate alows me to find the exit with a string
-            return currentLocation.getExits().Find(strExit => strExit.ToString().Equals(exitName) || strExit.getShortDirection().ToLower().Equals(exitName));
+            return currentLocation.getExits().Find(strExit => strExit.ToString().ToLower().Equals(exitName) || strExit.getShortDirection().ToLower().Equals(exitName));
         }
 
         #endregion
