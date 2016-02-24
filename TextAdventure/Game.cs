@@ -1,5 +1,5 @@
 ﻿#define DEBUG
-#undef DEBUG
+//#undef DEBUG
 
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,8 @@ namespace TextAdventure
 		private List<Item> inventory; // the player's inventory
 
         //
-        private List<string> splitterWords = new List<string> { "the", "with", "on", "and", "at", "room", "my", "is"};
+        private List<string> splitterWords = new List<string> { "the", "with", "and" };
+        private List<string> removableWords = new List<string> { "on", "at", "room", "my", "is", "exit" };
         Dictionary<string, CommandType> VerbCommands = new Dictionary<string, CommandType>
             {
                 { "use", CommandType.Use }, { "take", CommandType.Take }, { "look", CommandType.Look },
@@ -47,16 +48,16 @@ namespace TextAdventure
             // currently items must only be one word, spaces will break them
 
             Location l1_a1 = new Location("The Car", "You are at the end of a long alleyway, behind the car is a sheer drop, best not go that way.");// crashed car
-            Key l1_screwDriver = new Key("ScrewDriver", "This might come in handy.", false);
+            Key l1_screwDriver = new Key("Screw Driver", "This might come in handy.", false);
             l1_a1.addItem(l1_screwDriver);
 
             Location l1_a2 = new Location("The Alleyway", "A dark alleyway leading north to a gate and south to the car.");
-            Key l1_brokenPipe = new Key("BrokenPipe", "A piece of steel piping, it looks like it broke off of the piping above.", true);
+            Key l1_brokenPipe = new Key("Broken Pipe", "A piece of steel piping, it looks like it broke off of the piping above.", true);
             l1_a2.addItem(l1_brokenPipe);
 
-            Location l2_a1 = new Location("End of the alleyway");// gate at end locking the exit
+            Location l2_a1 = new Location("End of the alleyway", "There is a Metal gate standing North of you,\nblocking the exit from the alleyway.\nA Rusted chain with a Damaged Lock on it.\nIt looks like it could be easily broken with something...");// gate at end locking the exit
 
-            Location l3_a1 = new Location("Barricaded Street", "A wide street with barricades not far east and west blocking the roads. The street is surrounded by tall buildings.");
+            Location l3_a1 = new Location("Barricaded Street", "A wide street with barricades not far east and west blocking the roads.\nThe street is surrounded by tall buildings.");
 
             l1_a1.addExit(new Exit(Exit.Directions.North, l1_a2));
 
@@ -206,12 +207,16 @@ namespace TextAdventure
                     case CommandType.Help:
                         displayHelp();
                         break;
-                    case CommandType.Inventory:
-                        inspectInventory(commandList, inventory);
-                        break;
+                    /*case CommandType.Inventory:
+                        if (commandList.Count() == 1) inspectInventory(commandList[0], inventory);
+                        break;*/
                     case CommandType.Look:
-                        inspectInventory(commandList, currentLocation.getInventory());
-                        inspectInventory(commandList, inventory);
+                        bool locationInv = inspectInventory(commandList[0], currentLocation.getInventory());
+                        bool personalInv = inspectInventory(commandList[0], inventory);
+                        if (!locationInv && !personalInv)
+                        {
+                            Console.WriteLine("I cant see a {0}.", commandList[0]);
+                        }
                         break;
                     case CommandType.Move:
                         if (commandList.Count == 1) moveToLocation(commandList[0]);
@@ -226,11 +231,12 @@ namespace TextAdventure
                                 useKey(commandList);
                                 break;
                             default:
+                                Console.Write("I can only use an item on an exit!\n");
                                 break;
                         }
                         break;
                     case CommandType.ERROR:
-                        Console.WriteLine("I don't understand that, maybe you could re-phrase it.");
+                        Console.WriteLine("I don't understand that, maybe you could re-phrase it.\n");
                         break;
                 }
 
@@ -241,14 +247,75 @@ namespace TextAdventure
         private List<string> splitCommands(string _command)
         {
             List<string> commandList = _command.Split(' ').ToList();
-            foreach (string removable in splitterWords)
+            // remove all of the removable words
+            foreach (string removable in removableWords)
             {
                 if (commandList.Contains(removable))
                 {
                     commandList.RemoveAll(item => item == removable);
                 }
             }
-            return commandList;
+            // if there's only one command, dont bother formatting it; it'll break
+            if (commandList.Count() == 1)
+            {
+                return new List<string> { _command };
+            }
+            else
+            {
+                List<string> formattedWords = new List<string>();
+                string joinedWords = "";
+                for (int i = 0; i < commandList.Count(); i++)
+                {
+                    // if this word isn't a splitter
+                    if (!splitterWords.Contains(commandList[i]))
+                    {
+                        // is this word a verb or an exit?
+                        bool isVerb = VerbCommands.ContainsKey(commandList[i]);
+                        Exit foundExit = findExit(commandList[i]);
+                        bool isExit = foundExit != null;
+                        if (isVerb || isExit)
+                        {
+                            // if so, add it to the formatted list right away
+                            // this treats the verb as a splitter but still adds it to the list
+                            if (joinedWords != "")
+                            {
+                                // add the preveously formatted words to the list
+                                // ideally all commands will start out with a verb and there should never be a ver in the middle of a command
+                                formattedWords.Add(joinedWords);
+                                joinedWords = "";
+                            }
+                            // then add the verb 
+                            formattedWords.Add(commandList[i]);
+                        }
+                        else
+                        {
+                            if (joinedWords == "")
+                            {
+                                joinedWords = commandList[i];
+                            }
+                            else
+                            {
+                                joinedWords += " " + commandList[i];
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (joinedWords != "")
+                        {
+                            formattedWords.Add(joinedWords);
+                            joinedWords = "";
+                        }
+                    }
+                    if (i == commandList.Count() - 1)
+                    {
+                        formattedWords.Add(joinedWords);
+                    }
+                }
+                // Removing any empty strings added by accident
+                formattedWords.RemoveAll(str => str == "");
+                return formattedWords;
+            }
         }
 
         #region CommandMethods
@@ -260,25 +327,19 @@ namespace TextAdventure
         }
 
         // write the discriptions of the specified items in the respective inventory in the console
-        private void inspectInventory(List<string> items, List<Item> searchInventory)
+        private bool inspectInventory(string targetItem, List<Item> searchInventory)
         {
             // inspect an inventory and write the description of the item if found, else return false
             // check if that item is in your inventory.
-            foreach (Item currentItem in searchInventory)
+            Item foundItem = searchInventory.Find(currentItem => currentItem.ToString().Equals(targetItem));
+            if (foundItem != null)
             {
-                if (items.Contains(currentItem.ToString()))
-                {
-                    Console.WriteLine(currentItem.ItemDescription + "\n");
-                    items.Remove(currentItem.ToString());
-                }
+                Console.WriteLine(foundItem.ItemDescription + "\n");
+                return true;
             }
-            if (items.Count() < 0)
+            else
             {
-                foreach (string badItem in items)
-                {
-                    Console.Write("{0}, ", badItem);
-                }
-                Console.WriteLine("could not be taken.\n");
+                return false;
             }
         }
 
@@ -365,7 +426,7 @@ namespace TextAdventure
             }
             else
             {
-                Console.WriteLine("I cant go {0} from here.", newLocation);
+                Console.WriteLine("I cant go {0} from here.\n", newLocation);
             }
             //foreach (Exit currentExit in currentLocation.getExits())
             //{
@@ -438,7 +499,7 @@ namespace TextAdventure
                 }
                 else
                 {
-                    Console.WriteLine("You cant use that item like that!");
+                    Console.WriteLine("You cant use that item like that!\n");
                 }
 
             }
