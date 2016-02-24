@@ -34,7 +34,7 @@ namespace TextAdventure
         Dictionary<string, CommandType> VerbCommands = new Dictionary<string, CommandType>
             {
                 { "use", CommandType.Use }, { "take", CommandType.Take }, { "look", CommandType.Look },
-                { "move", CommandType.Move }, { "walk", CommandType.Move }, { "help", CommandType.Help }
+                { "move", CommandType.Move }, { "walk", CommandType.Move }, { "go", CommandType.Move }, { "help", CommandType.Help }
             };
 
         public Game()
@@ -485,6 +485,11 @@ namespace TextAdventure
             // ceck that both were found
             if (keyItem != null && targetExit != null)
             {
+                if (targetExit.Key == null)
+                {
+                    Console.WriteLine("The {0} exit is not locked.\n", targetExit.ToString());
+                    return;
+                }
                 // if the currentLocation's key item == the item found, unlock the exit.
                 if (targetExit.Key.Equals(keyItem))
                 {
