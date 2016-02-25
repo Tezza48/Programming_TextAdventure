@@ -412,7 +412,7 @@ namespace TextAdventure
                 Console.WriteLine("That exit is Locked");
             }
         }
-        // find a location from the exit matching the given string and use the above method to move to that location
+        // find a location from the exit matching the given string and pass it to the above method
         private void moveToLocation(string newLocation)
         {
             // check the location for the exit specified
