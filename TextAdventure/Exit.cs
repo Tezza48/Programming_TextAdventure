@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextAdventure.LevelEditor;
 
 namespace TextAdventure
 {
@@ -71,5 +72,17 @@ namespace TextAdventure
 		{
 			return leadsTo;
 		}
+
+        public static explicit operator Exit(LevelEditor.Exit v)
+        {
+            try
+            {
+                return new Exit((Directions)v.Direction, v.LeadsTo, (Key)v.Key);
+            }
+            catch
+            {
+                return new Exit((Directions)v.Direction, v.LeadsTo);
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextAdventure.LevelEditor;
 
 namespace TextAdventure
 {    
@@ -38,6 +39,11 @@ namespace TextAdventure
         public override string ToString()
         {
             return itemName.ToLower();
+        }
+
+        public static explicit operator Item(LevelEditor.Item v)
+        {
+            return new Item(v.ItemName, v.ItemDescription);
         }
     }
 }

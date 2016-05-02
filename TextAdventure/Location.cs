@@ -4,6 +4,7 @@ using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextAdventure.LevelEditor;
 
 namespace TextAdventure
 {
@@ -100,6 +101,30 @@ namespace TextAdventure
 		{
 			roomDescription = description;
 		}
-        
+
+        public static explicit operator Location(LevelEditor.Location v)
+        {
+            Location newLoc = new Location(v.Title, v.Description);
+            List<Item> items = new List<Item>();
+            List<Key> keys = new List<Key>();
+            foreach (LevelEditor.Item item in v.Inventory)
+            {
+                LevelEditor.Key iKey = item as LevelEditor.Key;
+                if (iKey == null)
+                    items.Add((Item)item);
+                else
+                    keys.Add((Key)iKey);
+            }
+            newLoc.inventory.AddRange(items);
+            newLoc.inventory.AddRange(keys);
+            for (int i = 0; i < v.Exits.Length; i++)
+            {
+                if (v.Exits[i] != null)
+                {
+                    newLoc.addExit((Exit)v.Exits[i]);
+                }
+            }
+            return newLoc;
+        }
     }
 }

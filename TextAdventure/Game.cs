@@ -1,8 +1,13 @@
-﻿using System;
+﻿#undef DEBUG
+
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextAdventure;
+using Newtonsoft.Json;
 
 namespace TextAdventure
 {
@@ -20,6 +25,8 @@ namespace TextAdventure
 	class Game
 	{
         List<Location> locations;
+
+        string startText = "Welcome adventurer, prepare yourself for a fantastical journey into the unknown.";
 
         int currentLocation;
 
@@ -41,15 +48,64 @@ namespace TextAdventure
             locations = new List<Location>();
             inventory = new List<Item>();
 
-            Console.WriteLine("Welcome adventurer, prepare yourself for a fantastical journey into the unknown.");
-
             // build the "map"
             // add locations and items
             // currently items must only be one word, spaces will break them
             
             ManuallySetTheMap();
+            LoadDataFile();
+
+            Console.WriteLine(startText);
 
             showLocation(false);
+        }
+
+        private void LoadDataFile()
+        {
+            LevelEditor.SaveData saveData;
+            if (File.Exists(Program.StoryPath))
+            {
+                string data = File.ReadAllText(Program.StoryPath);
+
+                // to replace the old namespace with the new one... took hours...
+                data.Replace("\"LevelEditor.Key, LevelEditor\"", "\"TextAdventure.LevelEditor.Key, TextAdventure\"");
+
+                saveData = JsonConvert.DeserializeObject<LevelEditor.SaveData>(data, new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Auto
+                });
+
+                startText = saveData.startText;
+
+                locations = new List<Location>();
+
+                for (int i = 0; i < saveData.locations.Count; i++)
+                {
+                    LevelEditor.Location currentLoc = saveData.locations[i];
+                    locations.Add((Location)currentLoc);
+                }
+
+                inventory = new List<Item>();
+                List<Item> items = new List<Item>();
+                List<Key> keys = new List<Key>();
+                foreach (LevelEditor.Item item in saveData.playerInventory)
+                {
+                    LevelEditor.Key iKey = item as LevelEditor.Key;
+                    if (iKey == null)
+                        items.Add((Item)item);
+                    else
+                        keys.Add((Key)iKey);
+                }
+                inventory.AddRange(items);
+                inventory.AddRange(keys);
+
+            }
+            else
+            {
+                isRunning = false;
+                Console.WriteLine("Story file is missing. Quitting...");
+                Console.ReadKey();
+            }
         }
 
         private void ManuallySetTheMap()
@@ -135,19 +191,19 @@ namespace TextAdventure
 
             List<string> commandList = splitCommands(command);
 
-            //#if DEBUG
-            //Console.ForegroundColor = ConsoleColor.DarkCyan;
-            //for (int i = 0; i < commandList.Count(); i++)
-            //{
-            //    Console.Write(commandList[i]);
-            //    if (i + 1 != commandList.Count())
-            //    {
-            //        Console.Write("\t|");
-            //    }
-            //}
-            //Console.WriteLine("\n");
-            //Console.ForegroundColor = ConsoleColor.White;
-            //#endif
+            #if DEBUG
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            for (int i = 0; i < commandList.Count(); i++)
+            {
+                Console.Write(commandList[i]);
+                if (i + 1 != commandList.Count())
+                {
+                    Console.Write("\t|");
+                }
+            }
+            Console.WriteLine("\n");
+            Console.ForegroundColor = ConsoleColor.White;
+            #endif
 
             #region SingleCommands
             // parse single commands
@@ -503,7 +559,7 @@ namespace TextAdventure
                     if (keyItem.IsDestroyedOnUse)
                     {
                         inventory.Remove(keyItem);
-                        Console.WriteLine("{0} was destroyed.", keyItem.ItemName);
+                        Console.WriteLine("{0} was destroyed.", keyItem.ItemDescription);
                     }
                     Console.WriteLine();
                 }
