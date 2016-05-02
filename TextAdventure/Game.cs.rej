@@ -1,0 +1,11 @@
+diff a/TextAdventure/Game.cs b/TextAdventure/Game.cs	(rejected hunks)
+@@ -170,6 +170,9 @@
+                     case "help":
+                         displayHelp();
+                         return;
++                    case "save":
++                        Save();
++                        return;
+                     default:
+                         Console.WriteLine("I don't understand {0}, are you confused?\n", command);
+                         return;

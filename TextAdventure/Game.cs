@@ -1,7 +1,4 @@
-﻿#define DEBUG
-//#undef DEBUG
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +19,9 @@ namespace TextAdventure
     }
 	class Game
 	{
-        Location currentLocation;
+        List<Location> locations;
+
+        int currentLocation;
 
 		public bool isRunning = true;
 
@@ -38,45 +37,51 @@ namespace TextAdventure
             };
 
         public Game()
-		{
+        {
+            locations = new List<Location>();
             inventory = new List<Item>();
 
-			Console.WriteLine("Welcome adventurer, prepare yourself for a fantastical journey into the unknown.");
+            Console.WriteLine("Welcome adventurer, prepare yourself for a fantastical journey into the unknown.");
 
             // build the "map"
             // add locations and items
             // currently items must only be one word, spaces will break them
-
-            Location l1_a1 = new Location("The Car", "You are at the end of a long alleyway, behind the car is a sheer drop, best not go that way.");// crashed car
-            Key l1_screwDriver = new Key("Screw Driver", "This might come in handy.", false);
-            l1_a1.addItem(l1_screwDriver);
-
-            Location l1_a2 = new Location("The Alleyway", "A dark alleyway leading north to a gate and south to the car.");
-            Key l1_brokenPipe = new Key("Broken Pipe", "A piece of steel piping, it looks like it broke off of the piping above.", true);
-            l1_a2.addItem(l1_brokenPipe);
-
-            Location l2_a1 = new Location("End of the alleyway", "There is a Metal gate standing North of you,\nblocking the exit from the alleyway.\nA Rusted chain with a Damaged Lock on it.\nIt looks like it could be easily broken with something...");// gate at end locking the exit
-
-            Location l3_a1 = new Location("Barricaded Street", "A wide street with barricades not far east and west blocking the roads.\nThe street is surrounded by tall buildings.");
-
-            l1_a1.addExit(new Exit(Exit.Directions.North, l1_a2));
-
-            l1_a2.addExit(new Exit(Exit.Directions.South, l1_a1));
-            l1_a2.addExit(new Exit(Exit.Directions.North, l2_a1));
-
-            l2_a1.addExit(new Exit(Exit.Directions.South, l1_a2));
-            l2_a1.addExit(new Exit(Exit.Directions.North, l3_a1, l1_brokenPipe));
-
-            l3_a1.addExit(new Exit(Exit.Directions.South, l2_a1));
-
-            currentLocation = l1_a1;
+            
+            ManuallySetTheMap();
 
             showLocation(false);
-		}
+        }
+
+        private void ManuallySetTheMap()
+        {
+            locations.Add(new Location("The Car", "You are at the end of a long alleyway, behind the car is a sheer drop, best not go that way."));// crashed car
+            locations.Add(new Location("The Alleyway", "A dark alleyway leading north to a gate and south to the car."));
+            locations.Add(new Location("End of the alleyway", "There is a Metal gate standing North of you,\nblocking the exit from the alleyway.\nA Rusted chain with a Damaged Lock on it.\nIt looks like it could be easily broken with something..."));// gate at end locking the exit
+            locations.Add(new Location("Barricaded Street", "A wide street with barricades not far east and west blocking the roads.\nThe street is surrounded by tall buildings."));
+
+
+            Key l1_screwDriver = new Key("Screw Driver", "This might come in handy.", false);
+            locations[0].addItem(l1_screwDriver);
+
+            Key l1_brokenPipe = new Key("Broken Pipe", "A piece of steel piping, it looks like it broke off of the piping above.", true);
+            locations[1].addItem(l1_brokenPipe);
+
+            locations[0].addExit(new Exit(Exit.Directions.North, 1));
+
+            locations[1].addExit(new Exit(Exit.Directions.South, 1));
+            locations[1].addExit(new Exit(Exit.Directions.North, 2));
+
+            locations[2].addExit(new Exit(Exit.Directions.South, 2));
+            locations[2].addExit(new Exit(Exit.Directions.North, 3, l1_brokenPipe));
+
+            locations[3].addExit(new Exit(Exit.Directions.South, 2));
+
+            currentLocation = 0;
+        }
 
 
         // TODO: Implement the input handling algorithm.
-		public void doAction(string command)
+        public void doAction(string command)
 		{
             #region Plan
             // what do i want the user to input
@@ -130,26 +135,26 @@ namespace TextAdventure
 
             List<string> commandList = splitCommands(command);
 
-            #if DEBUG
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            for (int i = 0; i < commandList.Count(); i++)
-            {
-                Console.Write(commandList[i]);
-                if (i + 1 != commandList.Count())
-                {
-                    Console.Write("\t|");
-                }
-            }
-            Console.WriteLine("\n");
-            Console.ForegroundColor = ConsoleColor.White;
-            #endif
+            //#if DEBUG
+            //Console.ForegroundColor = ConsoleColor.DarkCyan;
+            //for (int i = 0; i < commandList.Count(); i++)
+            //{
+            //    Console.Write(commandList[i]);
+            //    if (i + 1 != commandList.Count())
+            //    {
+            //        Console.Write("\t|");
+            //    }
+            //}
+            //Console.WriteLine("\n");
+            //Console.ForegroundColor = ConsoleColor.White;
+            //#endif
 
             #region SingleCommands
             // parse single commands
             if (commandList.Count == 1)
             {
                 // check for a direction
-                foreach (Exit currentExit in currentLocation.getExits())
+                foreach (Exit currentExit in locations[currentLocation].getExits())
                 {
                     if (currentExit.ToString().ToLower().Equals(command) || currentExit.getShortDirection().Equals(command))
                     {
@@ -211,7 +216,7 @@ namespace TextAdventure
                         if (commandList.Count() == 1) inspectInventory(commandList[0], inventory);
                         break;*/
                     case CommandType.Look:
-                        bool locationInv = inspectInventory(commandList[0], currentLocation.getInventory());
+                        bool locationInv = inspectInventory(commandList[0], locations[currentLocation].getInventory());
                         bool personalInv = inspectInventory(commandList[0], inventory);
                         if (!locationInv && !personalInv)
                         {
@@ -372,22 +377,22 @@ namespace TextAdventure
             Console.WriteLine("This is a debug build.\nAnything in dark cyan is a debug message.");
             Console.ForegroundColor = ConsoleColor.White;
             #endif
-            Console.WriteLine("\n" + currentLocation.getTitle() + "\n");
-			Console.WriteLine(currentLocation.getDescription());
+            Console.WriteLine("\n" + locations[currentLocation].getTitle() + "\n");
+			Console.WriteLine(locations[currentLocation].getDescription());
 
-			if (currentLocation.getInventory().Count > 0)
+			if (locations[currentLocation].getInventory().Count > 0)
 			{
 				Console.WriteLine("\nThe room contains the following:\n");
 
-				for ( int i = 0; i < currentLocation.getInventory().Count; i++ )
+				for ( int i = 0; i < locations[currentLocation].getInventory().Count; i++ )
 				{
-					Console.WriteLine(currentLocation.getInventory()[i].ItemName);
+					Console.WriteLine(locations[currentLocation].getInventory()[i].ItemName);
 				}
 			}
 	
 			Console.WriteLine("\nAvailable Exits: \n");
 
-			foreach (Exit exit in currentLocation.getExits() )
+			foreach (Exit exit in locations[currentLocation].getExits() )
 			{
 				Console.WriteLine(exit.getDirection());
 			}
@@ -449,7 +454,7 @@ namespace TextAdventure
             foreach (string item in items)
             {
                 isItem = false;
-                foreach (Item inventoryItem in currentLocation.getInventory())
+                foreach (Item inventoryItem in locations[currentLocation].getInventory())
                 {
                     // make sure it's not a scenery item
                     if (inventoryItem.GetType() != typeof(Scenery))
@@ -459,7 +464,7 @@ namespace TextAdventure
                         {
                             isItem = true;
                             inventory.Add(inventoryItem);
-                            currentLocation.removeItem(inventoryItem);
+                            locations[currentLocation].removeItem(inventoryItem);
                             Console.WriteLine("You took the {0}", inventoryItem.ItemName);
                         }
                     }
@@ -521,7 +526,7 @@ namespace TextAdventure
         private Exit findExit(string exitName)
         {
             // the predicate alows me to find the exit with a string
-            return currentLocation.getExits().Find(strExit => strExit.ToString().ToLower().Equals(exitName) || strExit.getShortDirection().ToLower().Equals(exitName));
+            return locations[currentLocation].getExits().Find(strExit => strExit.ToString().ToLower().Equals(exitName) || strExit.getShortDirection().ToLower().Equals(exitName));
         }
 
 #endregion

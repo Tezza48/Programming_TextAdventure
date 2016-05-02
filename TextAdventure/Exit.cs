@@ -15,7 +15,7 @@ namespace TextAdventure
 
 		public static string[] shortDirections = {"Null", "N", "S", "E", "W", "U", "D", "NE", "NW", "SE", "SW", "I", "O"};
 
-		private Location leadsTo;
+		private int leadsTo;
 		private Directions direction;
         private Key key;
 
@@ -24,18 +24,18 @@ namespace TextAdventure
         public Exit()
 		{
 			direction = Directions.Undefined;
-			leadsTo = null;
+			leadsTo = 0;
             key = null;
 		}
 
-        public Exit(Directions _direction, Location newLeadsTo)
+        public Exit(Directions _direction, int newLeadsTo)
         {
             direction = _direction;
             leadsTo = newLeadsTo;
             key = null;
         }
 
-        public Exit(Directions _direction, Location newLeadsTo, Key _key)
+        public Exit(Directions _direction, int newLeadsTo, Key _key)
         {
             direction = _direction;
             leadsTo = newLeadsTo;
@@ -62,12 +62,12 @@ namespace TextAdventure
 			return shortDirections[(int)direction].ToLower();
 		}
 
-		public void setLeadsTo(Location _leadsTo)
+		public void setLeadsTo(int _leadsTo)
 		{
 			leadsTo = _leadsTo;
 		}
 
-		public Location getLeadsTo()
+		public int getLeadsTo()
 		{
 			return leadsTo;
 		}
