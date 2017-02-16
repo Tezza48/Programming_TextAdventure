@@ -1,4 +1,4 @@
-﻿#define DEBUG
+﻿//#define DEBUG
 //#undef DEBUG
 
 using System;
@@ -39,25 +39,30 @@ namespace TextAdventure
 
         public Game()
 		{
+
+            Console.WindowWidth = 60;
+            Console.BufferWidth = 60;
+            Console.WindowHeight = 20;
+
             inventory = new List<Item>();
 
-			Console.WriteLine("Welcome adventurer, prepare yourself for a fantastical journey into the unknown.");
+			Console.WriteLine("Your head is spinning, ringing fills your ears. \nThe surroundings are hauntingly unfamiliar.");
 
             // build the "map"
             // add locations and items
             // currently items must only be one word, spaces will break them
 
-            Location l1_a1 = new Location("The Car", "You are at the end of a long alleyway, behind the car is a sheer drop, best not go that way.");// crashed car
+            Location l1_a1 = new Location("The Car", "You are at the end of a long alleyway, \nbehind the car is a sheer drop, best not go that way.");// crashed car
             Key l1_screwDriver = new Key("Screw Driver", "This might come in handy.", false);
             l1_a1.addItem(l1_screwDriver);
 
-            Location l1_a2 = new Location("The Alleyway", "A dark alleyway leading north to a gate and south to the car.");
+            Location l1_a2 = new Location("The Alleyway", "A dark alleyway leading north to a gate and south to \nthe car.");
             Key l1_brokenPipe = new Key("Broken Pipe", "A piece of steel piping, it looks like it broke off of the piping above.", true);
             l1_a2.addItem(l1_brokenPipe);
 
             Location l2_a1 = new Location("End of the alleyway", "There is a Metal gate standing North of you,\nblocking the exit from the alleyway.\nA Rusted chain with a Damaged Lock on it.\nIt looks like it could be easily broken with something...");// gate at end locking the exit
 
-            Location l3_a1 = new Location("Barricaded Street", "A wide street with barricades not far east and west blocking the roads.\nThe street is surrounded by tall buildings.");
+            Location l3_a1 = new Location("Barricaded Street", "A wide street with barricades not far east and west \nblocking the roads. The street is surrounded by tall \nbuildings.");
 
             l1_a1.addExit(new Exit(Exit.Directions.North, l1_a2));
 
